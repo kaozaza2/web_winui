@@ -1,11 +1,11 @@
-# web_winui — WinUI 3 design for the Odoo 18 backend
+# web_winui — WinUI 3 design for the Odoo 16 backend
 
 Re-skins the Odoo web client with Microsoft's **WinUI 3 / Fluent Design System**,
 without touching a single Odoo template, widget or class. Every third-party
 module that builds its UI out of the standard `o_*` and Bootstrap classes — which
 is how Odoo modules are written — inherits the new look automatically.
 
-* **Odoo version:** 18.0 (Community and Enterprise)
+* **Odoo version:** 16.0 (Community and Enterprise)
 * **Depends on:** `web`, `mail` — `mail` is declared so its assets load first
   and the chatter can be themed by cascade order rather than by escalating
   specificity

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
 
-    <t t-name="web_winui.ThemeMenu">
+    <t t-name="web_winui.ThemeMenu" owl="1">
         <Dropdown menuClass="'o_winui_theme_menu'">
             <button class="o_winui_theme_toggle" title="Appearance" aria-label="Appearance">
                 <i class="fa fa-fw" t-att-class="currentIcon"/>

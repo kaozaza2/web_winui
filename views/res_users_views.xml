@@ -19,7 +19,7 @@
                         <field name="winui_accent_custom"
                                widget="color"
                                readonly="0"
-                               invisible="winui_accent != 'custom'"/>
+                               attrs="{'invisible': [('winui_accent', '!=', 'custom')]}"/>
                         <field name="winui_material" readonly="0"/>
                     </group>
                     <group>
@@ -45,7 +45,7 @@
                         <field name="winui_accent"/>
                         <field name="winui_accent_custom"
                                widget="color"
-                               invisible="winui_accent != 'custom'"/>
+                               attrs="{'invisible': [('winui_accent', '!=', 'custom')]}"/>
                         <field name="winui_material"/>
                     </group>
                     <group>

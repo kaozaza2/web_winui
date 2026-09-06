@@ -1,4 +1,27 @@
 ///============================================================================
+/// web_winui - Sass helpers absent from Odoo 16
+///
+/// `o-to-rem()` and `o-strip-unit()` live in `web/static/src/scss/functions.scss`
+/// from Odoo 17 onwards; 16.0 has no equivalent. Every metric below is written
+/// in px and converted through `o-to-rem()`, so the pair is defined here rather
+/// than rewriting ninety call sites - which also keeps this file readable
+/// against the 18.0 branch.
+///
+/// The implementations are transcribed from Odoo 18 so the two branches
+/// produce identical values. Both are plain definitions: this file is injected
+/// before Odoo's own SCSS, so if a later 16.0 point release adds the helpers,
+/// its definitions load afterwards and win.
+///============================================================================
+
+@function o-strip-unit($-value) {
+    @return $-value / ($-value * 0 + 1);
+}
+
+@function o-to-rem($-px-value, $-base: 16) {
+    @return (o-strip-unit($-px-value) / o-strip-unit($-base)) * 1rem;
+}
+
+///============================================================================
 /// web_winui - Fluent / WinUI 3 primary variables
 ///
 /// Injected *before* `web/static/src/scss/primary_variables.scss` and before

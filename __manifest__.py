@@ -38,9 +38,9 @@ What it covers
   backdrop material, density, corner style, motion and transparency. Stored per
   user and switchable from the systray without a reload.
 
-Requires Odoo 18.0.
+Requires Odoo 16.0.
 """,
-    "version": "18.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Themes/Backend",
     "license": "LGPL-3",
     "author": "MokiMikore",
@@ -128,9 +128,10 @@ Requires Odoo 18.0.
             "web_winui/static/src/js/components/winui_app_drawer.js",
             "web_winui/static/src/js/components/winui_app_drawer.xml",
         ],
-        # The lazily loaded graph/pivot bundle re-imports the variable chain, so
-        # it needs the same injection to compile against the Fluent tokens.
-        "web.assets_backend_lazy": [
+        # The lazily loaded legacy bundle re-imports the variable chain, so it
+        # needs the same injection to compile against the Fluent tokens.
+        # (Odoo 18 calls this bundle `web.assets_backend_lazy`.)
+        "web.assets_backend_legacy_lazy": [
             (
                 "before",
                 "web/static/src/scss/primary_variables.scss",
@@ -141,7 +142,8 @@ Requires Odoo 18.0.
         # web_dark_mode. This theme does not need it - it switches through CSS
         # custom properties - but keeping the variables consistent avoids a
         # double-dark result when one of those modules is installed alongside.
-        "web.assets_web_dark": [
+        # (Odoo 18 calls this bundle `web.assets_web_dark`.)
+        "web.dark_mode_assets_backend": [
             (
                 "after",
                 "web_winui/static/src/scss/tokens/winui_primary_variables.scss",

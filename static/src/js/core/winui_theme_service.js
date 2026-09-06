@@ -2,9 +2,7 @@
 
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
-import { rpc } from "@web/core/network/rpc";
 import { session } from "@web/session";
-import { user } from "@web/core/user";
 import { reactive } from "@odoo/owl";
 
 import { WINUI_DEFAULTS } from "./winui_constants";
@@ -103,8 +101,10 @@ applyWinuiSettings(bootSettings);
 writeCache(bootSettings);
 
 export const winuiThemeService = {
-    dependencies: [],
-    start() {
+    // 16.0 exposes RPC as a service rather than the free `rpc` function that
+    // 18.0 exports from `@web/core/network/rpc`, so it is injected here.
+    dependencies: ["rpc"],
+    start(env, { rpc }) {
         const state = reactive({ ...bootSettings });
 
         /**
@@ -147,7 +147,8 @@ export const winuiThemeService = {
             async set(changes, { persist = true } = {}) {
                 Object.assign(state, changes);
                 apply();
-                if (!persist || !user.userId) {
+                // 16.0 has no `@web/core/user`; the session carries the uid.
+                if (!persist || !session.uid) {
                     return;
                 }
                 try {

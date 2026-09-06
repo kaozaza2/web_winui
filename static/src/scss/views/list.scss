@@ -308,3 +308,14 @@
 .o_web_client .o_list_table .o_optional_columns_dropdown_toggle {
     min-inline-size: 0;
 }
+
+// ---------------------------------------------------------------------------
+// 16.0: the table's own fill
+// ---------------------------------------------------------------------------
+// Odoo 16 paints the table element itself opaque white from
+// `.o_list_renderer .o_list_table` (0,2,0) - a rule 18.0 does not have, so the
+// theme never had to answer it there. The surface belongs to the renderer and
+// to the card around it, so the table is cleared and inherits instead.
+.o_web_client .o_list_renderer .o_list_table {
+    background-color: transparent;
+}

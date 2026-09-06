@@ -2,11 +2,15 @@
 <templates xml:space="preserve">
 
     <!--
-        Replace Odoo's apps dropdown with the drawer. Only the `Dropdown` node is
-        touched, so the small-screen branch above it keeps Odoo's sidebar - the
-        drawer is reached from that sidebar's "All Apps" button instead.
+        Replace Odoo's apps dropdown with the drawer.
+
+        In 16.0 `web.NavBar.AppsMenu` is a single `Dropdown` with no
+        small-screen branch, so the toggle and the drawer are both emitted from
+        this one xpath. The drawer has to be a sibling of the toggle rather than
+        its child: it listens for its open event on the bus, and a component
+        only listens while it is mounted.
     -->
-    <t t-name="web_winui.NavBar.AppsMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+    <t t-name="web_winui.NavBar.AppsMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension" owl="1">
         <xpath expr="//Dropdown" position="replace">
             <button
                 class="o_winui_apps_toggle"
@@ -17,20 +21,11 @@
             >
                 <i class="oi oi-apps"/>
             </button>
-        </xpath>
-
-        <!--
-            Mounted outside the small-screen conditional on purpose. The drawer
-            listens for its open event on the bus, and a component only listens
-            while it is mounted - rendering it inside the desktop branch would
-            leave the mobile sidebar's "All Apps" button shouting into a void.
-        -->
-        <xpath expr="//t[@t-else]" position="after">
             <WinuiAppDrawer/>
         </xpath>
     </t>
 
-    <t t-name="web_winui.AppDrawer">
+    <t t-name="web_winui.AppDrawer" owl="1">
         <!--
             Portalled to the body so the sheet is a sibling of the web client
             rather than a descendant of the navbar, which would clip it.

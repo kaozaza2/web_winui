@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
 
-    <t t-name="web_winui.SettingsDialog">
+    <t t-name="web_winui.SettingsDialog" owl="1">
         <Dialog title="title" size="'md'" contentClass="'o_winui_settings_dialog'">
             <div class="o_winui_settings">
 
