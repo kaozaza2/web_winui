@@ -341,7 +341,10 @@ export class WinuiAppDrawer extends Component {
 // ---------------------------------------------------------------------------
 NavBar.components = { ...NavBar.components, WinuiAppDrawer };
 
-patch(NavBar.prototype, {
+// 16.0's `patch()` is `patch(obj, patchName, patchValue)`; the two-argument
+// form is 17.0 onwards. The name has to be unique across patches on this
+// prototype, so it is namespaced to the module.
+patch(NavBar.prototype, "web_winui.NavBar", {
     /** The navbar button and the mobile sidebar both open the same drawer. */
     onWinuiAppDrawerToggle() {
         this.env.bus.trigger(TOGGLE_EVENT);

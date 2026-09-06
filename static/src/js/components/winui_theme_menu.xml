@@ -2,12 +2,21 @@
 <templates xml:space="preserve">
 
     <t t-name="web_winui.ThemeMenu" owl="1">
-        <Dropdown menuClass="'o_winui_theme_menu'">
-            <button class="o_winui_theme_toggle" title="Appearance" aria-label="Appearance">
+        <!--
+            16.0's Dropdown renders the `toggler` slot inside a button it owns,
+            and takes the menu from the *default* slot. (17.0 onwards the
+            toggler is a direct child and the menu goes in a `content` slot.)
+            The toggle class therefore has to be handed over as `togglerClass`
+            rather than set on a button of our own.
+        -->
+        <Dropdown menuClass="'o_winui_theme_menu'"
+                  togglerClass="'o_winui_theme_toggle'"
+                  title="'Appearance'">
+            <t t-set-slot="toggler">
                 <i class="fa fa-fw" t-att-class="currentIcon"/>
-            </button>
+            </t>
 
-            <t t-set-slot="content">
+            <t t-set-slot="default">
                 <div class="dropdown-header">Appearance</div>
                 <DropdownItem
                     t-foreach="themes"
