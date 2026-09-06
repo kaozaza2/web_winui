@@ -250,3 +250,21 @@
         background-color: transparent;
     }
 }
+
+// ---------------------------------------------------------------------------
+// 5. 16.0 chatter
+// ---------------------------------------------------------------------------
+// The rest of this file targets the `o-mail-*` component classes introduced in
+// 17.0. 16.0 still uses the older `o_Component_part` scheme, so those rules do
+// not match here and its chatter is largely left with Odoo's own styling -
+// which is legible, because the theme's surfaces and text tokens reach it
+// through the generic `o_*` sweep.
+//
+// The exception is the per-message action toolbar, which carries an opaque
+// white fill of its own and so stays white on a dark thread.
+.o_web_client .o_MessageActionList {
+    border: 1px solid var(--winui-stroke-flyout);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-layer-solid);
+    color: var(--winui-text-primary);
+}

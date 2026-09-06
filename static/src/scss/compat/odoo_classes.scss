@@ -57,14 +57,26 @@
     }
 
     // -- Cog / action menus -------------------------------------------------
+    // A floor, not a fixed width. 16.0's action menus carry an icon *and* a
+    // label ("Print", "Action"), so pinning them to the control height clipped
+    // the label and ran it into the next button; 18.0's are icon-only, where
+    // the floor alone still yields the same 32px square because the padding is
+    // zeroed here.
     .o_cp_action_menus .dropdown-toggle,
     .o_cog_menu .dropdown-toggle {
-        inline-size: var(--winui-control-height);
         min-inline-size: var(--winui-control-height);
         padding-inline: 0;
         justify-content: center;
 
         &::after { display: none; }
+    }
+
+    // A labelled action menu needs its padding back, and room between the icon
+    // and the text.
+    .o_cp_action_menus .dropdown-toggle:has(.o_dropdown_title),
+    .o_cog_menu .dropdown-toggle:has(.o_dropdown_title) {
+        gap: 4px;
+        padding-inline: 8px;
     }
 
     // -- Debug menu ---------------------------------------------------------
