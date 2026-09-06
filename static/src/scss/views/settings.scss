@@ -1,0 +1,287 @@
+///============================================================================
+/// web_winui - Settings view = the Windows 11 Settings page
+///
+/// This is the one Odoo screen with a direct WinUI counterpart. The Windows 11
+/// Settings app is a left NavigationView plus a column of *SettingsCards*: 64px
+/// rounded rows carrying a glyph, a header, a description, and the control on
+/// the trailing edge. Odoo's `.o_setting_box` maps onto that one-to-one.
+///============================================================================
+
+.o_web_client .o_setting_container {
+    background-color: transparent;
+
+    // -- The app rail = NavigationView --------------------------------------
+    .settings_tab {
+        inline-size: 240px;
+        padding: 8px;
+        border: 0;
+        // The rail and the content share the page tone, so the divider is what
+        // separates them - exactly how a NavigationView pane is delimited.
+        border-inline-end: 1px solid var(--winui-stroke-divider) !important;
+        background-color: transparent;
+
+        a.tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            min-block-size: var(--winui-nav-item-height);
+            margin-block-end: 2px;
+            padding: 4px 12px;
+            border: 0;
+            border-radius: var(--winui-radius-control);
+            background-color: transparent;
+            color: var(--winui-text-primary);
+            text-decoration: none;
+            transition: background-color var(--winui-dur-instant) linear;
+
+            &:hover { background-color: var(--winui-subtle-secondary); }
+            &:active { background-color: var(--winui-subtle-tertiary); }
+
+            // Odoo tags the active tab `.text-bg-primary` on small screens,
+            // which paints an accent block with `!important` and hands it
+            // Bootstrap's contrasting text colour. A NavigationView marks its
+            // selection with a subtle fill and an accent pill instead, so the
+            // utility has to be forced back off.
+            &.selected {
+                background-color: var(--winui-subtle-secondary) !important;
+                color: var(--winui-text-primary) !important;
+                font-weight: 600;
+
+                // The 3px NavigationView selection pill.
+                &::before {
+                    content: "";
+                    position: absolute;
+                    inset-inline-start: 0;
+                    inset-block: 8px;
+                    inline-size: 3px;
+                    border-radius: 2px;
+                    background-color: var(--winui-accent-fill);
+                }
+            }
+
+            .icon {
+                inline-size: 20px;
+                block-size: 20px;
+                background-size: contain !important;
+            }
+        }
+    }
+
+    // -- Section headers ----------------------------------------------------
+    // Odoo renders these as a full-bleed grey band; Fluent uses a plain
+    // BodyLarge heading with nothing behind it.
+    .app_settings_block h2 {
+        margin-block: 24px 8px;
+        padding: 0;
+        border: 0;
+        background: transparent !important;
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body-large);
+        line-height: calc(var(--winui-line-body-large) / var(--winui-font-body-large));
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .app_settings_block {
+        padding-inline: 8px;
+    }
+
+    // -- SettingsCard -------------------------------------------------------
+    // The Windows 11 Settings row: a 64px rounded card holding a title, a
+    // description and its control.
+    .o_settings_container .o_setting_box {
+        min-block-size: 64px;
+        margin-block-end: 8px;
+        padding: 12px 16px;
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-card-default);
+        color: var(--winui-text-primary);
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover { background-color: var(--winui-card-tertiary); }
+
+        // Odoo draws a left rule on each setting; the card border replaces it.
+        > div,
+        .o_setting_left_pane,
+        .o_setting_right_pane {
+            border: 0 !important;
+        }
+
+        .o_form_label,
+        label {
+            color: var(--winui-text-primary);
+            font-weight: 400;
+            font-size: var(--winui-font-body);
+        }
+
+        .text-muted,
+        .o_form_label + .text-muted {
+            color: var(--winui-text-secondary) !important;
+            font-size: var(--winui-font-caption);
+        }
+    }
+
+    // Odoo's inline "→ Manage Users" style links.
+    .btn-link {
+        color: var(--winui-accent-text);
+    }
+}
+
+// Odoo paints the settings surface opaque white
+// (`.o_base_settings_view .o_form_renderer .o_setting_container .settings`).
+// Left alone it puts the cards and their controls back on a white-on-white
+// footing; the page tone has to come through instead.
+.o_web_client .o_form_renderer .o_setting_container .settings,
+.o_web_client .o_form_renderer .o_setting_container .settings .settingSearchHeader {
+    background-color: transparent;
+}
+
+// The app rail carries a light fill of its own. On a small screen it turns
+// into a horizontal tab strip across the top, where a white band in dark mode
+// is impossible to miss.
+// Odoo publishes the settings palette as its own custom properties on
+// `.o_base_settings_view .o_form_renderer`, then consumes them from rules that
+// are more specific than anything reasonable this theme can write
+// (`.o_base_settings_view .o_form_renderer .o_setting_container .settings_tab`
+// is four classes deep). Overriding the *rules* is a losing game, so the hooks
+// are refilled instead - the same tactic used for `--NavBar-brand-color`.
+// The selector repeats Odoo's and prefixes `.o_web_client`, so it lands on the
+// identical element one class heavier and the values follow the theme.
+.o_web_client .o_base_settings_view .o_form_renderer {
+    --settings__tab-bg: transparent;
+    --settings__tab-bg--active: var(--winui-subtle-secondary);
+    --settings__tab-color: var(--winui-text-secondary);
+    --settings__title-bg: transparent;
+}
+
+@media (max-width: 767.98px) {
+    .o_web_client .settings_tab {
+        inline-size: 100%;
+        padding: 4px 8px;
+        border-inline-end: 0 !important;
+        border-block-end: 1px solid var(--winui-stroke-divider) !important;
+
+        a.tab {
+            min-block-size: var(--winui-control-height);
+            border-radius: var(--winui-radius-control);
+
+            // The selection pill runs along the bottom edge when the rail is
+            // laid out horizontally, matching a top-mode NavigationView.
+            &.selected::before {
+                inset: auto 12px 2px 12px;
+                inline-size: auto;
+                block-size: 3px;
+            }
+        }
+    }
+}
+
+///============================================================================
+/// The web_winui appearance surfaces themselves
+///============================================================================
+
+// -- Systray toggle -----------------------------------------------------------
+.o_web_client .o_main_navbar .o_winui_theme_toggle {
+    inline-size: var(--winui-nav-item-height);
+    min-inline-size: var(--winui-nav-item-height);
+    padding-inline: 0;
+    justify-content: center;
+}
+
+.o_winui_theme_menu {
+    min-inline-size: 260px;
+}
+
+// -- Accent swatch grid -------------------------------------------------------
+.o_winui_accent_grid {
+    display: grid;
+    grid-template-columns: repeat(7, 32px);
+    gap: 8px;
+}
+
+.o_winui_accent_swatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1;
+}
+
+// The custom-colour tile hides the native picker behind the swatch so the grid
+// stays visually uniform.
+.o_winui_accent_custom {
+    position: relative;
+    overflow: hidden;
+    background: conic-gradient(
+        #C42B1C, #CA5010, #EAA300, #10893E, #038387, #0078D4, #8764B8, #E3008C, #C42B1C
+    );
+
+    > input[type="color"] {
+        position: absolute;
+        inset: 0;
+        inline-size: 100%;
+        block-size: 100%;
+        padding: 0;
+        border: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+}
+
+// -- The appearance dialog ----------------------------------------------------
+.o_winui_settings {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.o_winui_setting_card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-block-size: 64px;
+    padding: 12px 16px;
+    border: 1px solid var(--winui-stroke-card);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-card-default);
+    color: var(--winui-text-primary);
+
+    &.o_winui_setting_card_stacked {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+}
+
+.o_winui_setting_text {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+}
+
+.o_winui_setting_title {
+    font-size: var(--winui-font-body);
+    font-weight: 400;
+    color: var(--winui-text-primary);
+}
+
+.o_winui_setting_help {
+    margin-block-start: 2px;
+    font-size: var(--winui-font-caption);
+    line-height: calc(var(--winui-line-caption) / var(--winui-font-caption));
+    color: var(--winui-text-secondary);
+}
+
+.o_winui_setting_control {
+    flex: 0 0 auto;
+    inline-size: auto;
+    min-inline-size: 160px;
+}
+
+.o_winui_setting_card .o_winui_setting_control.o_boolean_toggle,
+.o_winui_setting_card .form-switch {
+    min-inline-size: 0;
+}

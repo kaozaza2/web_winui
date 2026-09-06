@@ -1,0 +1,85 @@
+///============================================================================
+/// web_winui - Windows accent colour palette
+///
+/// Windows derives six shades from the chosen accent colour (Light1..Light3,
+/// Dark1..Dark3) and exposes them as SystemAccentColorLight1..Dark3. Checking
+/// the shipped ramp for the default blue (#0078D4 -> #429CE3 / #76B9ED /
+/// #A6D8FF / #005A9E / #004275 / #002642) shows the shades are the base colour
+/// mixed towards white at 74% / 53% / 30% and towards black at 75% / 55% / 31%.
+/// `winui_color.js` implements the same formula so a custom colour picked at
+/// runtime produces an identical ramp.
+///============================================================================
+
+@mixin winui-accent-ramp($-base) {
+    --winui-accent: #{$-base};
+    --winui-accent-light-1: #{mix($-base, #FFFFFF, 74%)};
+    --winui-accent-light-2: #{mix($-base, #FFFFFF, 53%)};
+    --winui-accent-light-3: #{mix($-base, #FFFFFF, 30%)};
+    --winui-accent-dark-1: #{mix($-base, #000000, 75%)};
+    --winui-accent-dark-2: #{mix($-base, #000000, 55%)};
+    --winui-accent-dark-3: #{mix($-base, #000000, 31%)};
+
+    --winui-accent-rgb: #{red($-base)}, #{green($-base)}, #{blue($-base)};
+    --winui-accent-light-2-rgb: #{red(mix($-base, #FFFFFF, 53%))}, #{green(mix($-base, #FFFFFF, 53%))}, #{blue(mix($-base, #FFFFFF, 53%))};
+    --winui-accent-dark-1-rgb: #{red(mix($-base, #000000, 75%))}, #{green(mix($-base, #000000, 75%))}, #{blue(mix($-base, #000000, 75%))};
+}
+
+// The accent set offered in the user preferences, taken from the Windows 11
+// "Personalisation > Colours" grid, plus Odoo's own brand purple for anyone who
+// wants the Fluent shell without giving up the Odoo hue.
+$winui-accents: (
+    "blue": #0078D4,
+    "navy": #0063B1,
+    "teal": #038387,
+    "green": #10893E,
+    "seafoam": #00B294,
+    "purple": #8764B8,
+    "orchid": #C239B3,
+    "red": #C42B1C,
+    "orange": #CA5010,
+    "gold": #EAA300,
+    "plum": #E3008C,
+    "steel": #69797E,
+    "odoo": #714B67,
+);
+
+@each $-name, $-color in $winui-accents {
+    :root[data-winui-accent="#{$-name}"] {
+        @include winui-accent-ramp($-color);
+    }
+}
+
+// `system` is the Windows default blue. The CSS `AccentColor` keyword is not
+// used here on purpose: it resolves to a single colour with no accessible
+// channels, so the five derived shades and the `--winui-accent-*-rgb`
+// companions could not be kept in step with it.
+:root[data-winui-accent="system"] {
+    @include winui-accent-ramp(#0078D4);
+}
+
+// A swatch used by the accent picker in the preferences dialog and systray.
+.o_winui_accent_swatch {
+    display: inline-block;
+    inline-size: 32px;
+    block-size: 32px;
+    border: 1px solid var(--winui-stroke-control-secondary);
+    border-radius: var(--winui-radius-control);
+    background: var(--winui-swatch, var(--winui-accent));
+    cursor: pointer;
+    transition: transform var(--winui-dur-instant) var(--winui-ease-point);
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    &.active {
+        outline: 2px solid var(--winui-accent-fill);
+        outline-offset: 2px;
+    }
+}
+
+@each $-name, $-color in $winui-accents {
+    .o_winui_accent_swatch[data-accent="#{$-name}"] {
+        --winui-swatch: #{$-color};
+    }
+}

@@ -1,0 +1,175 @@
+///============================================================================
+/// web_winui - InfoBar and Notification (toast)
+///
+/// A Fluent InfoBar is a full-width strip with a 4px radius, a 1px
+/// CardStrokeColorDefault border, a SystemFillColor*Background wash, a 16px
+/// status glyph, a BodyStrong title, a Body message and a Subtle close button.
+/// Odoo's `.alert` and `.o_notification` map onto it directly.
+///============================================================================
+
+@mixin winui-infobar($-fill, $-bg, $-link) {
+    border-color: var(--winui-stroke-card);
+    background-color: var($-bg);
+    color: var(--winui-text-primary);
+
+    // Consumed by the severity stripe and by any inline link in the body, so
+    // the two always agree on the severity colour.
+    --winui-infobar-accent: var(#{$-fill});
+    --winui-infobar-link: var(#{$-link});
+}
+
+.o_web_client,
+.modal,
+.o_dialog_container {
+
+    // Deliberately a block, not a flex row. Odoo writes alert bodies as prose
+    // with inline markup in the middle of a sentence - the accounting
+    // "You have <a>outstanding credits</a> listed below..." banner is the
+    // canonical one. A flex container wraps each bare text node in an anonymous
+    // flex item, so that single sentence became three side-by-side columns.
+    // The severity stripe is therefore positioned rather than laid out.
+    .alert {
+        position: relative;
+        display: block;
+        padding: 12px 16px 12px 22px;
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-fill-attention-bg);
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body);
+        box-shadow: none;
+
+        --winui-infobar-accent: var(--winui-accent-fill);
+        --winui-infobar-link: var(--winui-accent-text);
+
+        // The leading severity stripe, standing in for the InfoBar glyph.
+        &::before {
+            content: "";
+            position: absolute;
+            inset-block: 12px;
+            inset-inline-start: 10px;
+            inline-size: 4px;
+            border-radius: 2px;
+            background-color: var(--winui-infobar-accent);
+        }
+
+        .alert-heading {
+            font-size: var(--winui-font-body);
+            font-weight: 600;
+            color: inherit;
+        }
+
+        // Bootstrap derives `.alert-link` from the *light* alert variant, so it
+        // stays a near-black blue on the dark wash. Odoo marks these anchors
+        // `role="button"`, which the global link rule in `base/typography.scss`
+        // deliberately skips, so the colour has to be given here.
+        //
+        // They must also stay inline: they sit mid-sentence, and any button
+        // metrics (min-height, block display, padding) break the line box.
+        .alert-link,
+        a[role="button"],
+        .btn-link {
+            display: inline;
+            min-block-size: 0;
+            block-size: auto;
+            padding: 0;
+            border: 0;
+            background: none;
+            color: var(--winui-infobar-link);
+            font-weight: 600;
+            white-space: normal;
+            vertical-align: baseline;
+            text-align: start;
+            text-decoration: none;
+
+            &:hover,
+            &:focus-visible {
+                color: var(--winui-infobar-link);
+                text-decoration: underline;
+                text-underline-offset: 2px;
+            }
+        }
+    }
+
+    .alert-success { @include winui-infobar(--winui-fill-success, --winui-fill-success-bg, --winui-text-success); }
+    .alert-danger  { @include winui-infobar(--winui-fill-critical, --winui-fill-critical-bg, --winui-text-critical); }
+    .alert-warning { @include winui-infobar(--winui-fill-caution, --winui-fill-caution-bg, --winui-text-caution); }
+    .alert-info,
+    .alert-primary { @include winui-infobar(--winui-accent-fill, --winui-fill-attention-bg, --winui-accent-text); }
+    .alert-secondary,
+    .alert-light,
+    .alert-dark    { @include winui-infobar(--winui-fill-solid-neutral, --winui-fill-neutral-bg, --winui-text-primary); }
+}
+
+// -- Notification / toast -----------------------------------------------------
+.o_notification_manager {
+    gap: 12px;
+
+    .o_notification {
+        inline-size: 360px;
+        max-inline-size: calc(100vw - 32px);
+        padding: 12px 16px;
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-overlay);
+        box-shadow: var(--winui-shadow-flyout);
+        color: var(--winui-text-primary);
+
+        @include winui-acrylic;
+
+        .o_notification_title,
+        .toast-header {
+            font-size: var(--winui-font-body);
+            font-weight: 600;
+            color: var(--winui-text-primary);
+            background: transparent;
+            border: 0;
+            padding: 0;
+        }
+
+        .o_notification_content,
+        .toast-body {
+            padding: 4px 0 0;
+            color: var(--winui-text-secondary);
+        }
+
+        .o_notification_buttons {
+            margin-block-start: 12px;
+            gap: 8px;
+        }
+
+        // Severity is carried by the icon colour, as in a Fluent Notification.
+        .o_notification_icon.text-success { color: var(--winui-fill-success) !important; }
+        .o_notification_icon.text-danger  { color: var(--winui-fill-critical) !important; }
+        .o_notification_icon.text-warning { color: var(--winui-fill-caution) !important; }
+        .o_notification_icon.text-info    { color: var(--winui-accent-fill) !important; }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Notification: the inner box
+// ---------------------------------------------------------------------------
+// `web.NotificationWowl` wraps its content in
+// `<div class="w-100 py-3 ps-3 pe-5 border border-start-0 rounded-end">`, so
+// Bootstrap's `.border` utility draws a second outline *inside* the toast -
+// and the toast itself is already a card here. The result reads as a card
+// nested in a card.
+//
+// The utility carries `!important`, so clearing it has to as well. The stripe
+// down the leading edge is Odoo's own `.o_notification_bar`, not a border, and
+// is left alone - it only takes the theme's accent so it stops being a fixed
+// Bootstrap blue against a themed accent.
+.o_web_client .o_notification {
+    > .border,
+    > .border-start-0 {
+        border: 0 !important;
+    }
+
+    .o_notification_bar.bg-primary,
+    .o_notification_bar.bg-info {
+        background-color: var(--winui-accent-fill) !important;
+    }
+
+    .o_notification_bar.bg-success  { background-color: var(--winui-fill-success) !important; }
+    .o_notification_bar.bg-danger   { background-color: var(--winui-fill-critical) !important; }
+    .o_notification_bar.bg-warning  { background-color: var(--winui-fill-caution) !important; }
+}

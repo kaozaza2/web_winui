@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="web_winui.ThemeMenu">
+        <Dropdown menuClass="'o_winui_theme_menu'">
+            <button class="o_winui_theme_toggle" title="Appearance" aria-label="Appearance">
+                <i class="fa fa-fw" t-att-class="currentIcon"/>
+            </button>
+
+            <t t-set-slot="content">
+                <div class="dropdown-header">Appearance</div>
+                <DropdownItem
+                    t-foreach="themes"
+                    t-as="entry"
+                    t-key="entry.value"
+                    class="{ 'active': settings.theme === entry.value }"
+                    onSelected="() => this.onSelectTheme(entry.value)"
+                >
+                    <i class="fa fa-fw me-2" t-att-class="entry.icon"/>
+                    <span t-out="entry.label"/>
+                    <span t-if="entry.value === 'auto'" class="ms-auto ps-3 small text-muted"
+                          t-out="theme.resolvedTheme"/>
+                </DropdownItem>
+
+                <div class="dropdown-divider"/>
+                <div class="dropdown-header">Accent colour</div>
+                <div class="o_winui_accent_grid px-3 pb-2">
+                    <button
+                        t-foreach="accents"
+                        t-as="accent"
+                        t-key="accent.value"
+                        type="button"
+                        class="o_winui_accent_swatch"
+                        t-att-data-accent="accent.value"
+                        t-att-class="{ 'active': settings.accent === accent.value }"
+                        t-att-title="accent.label"
+                        t-att-aria-label="accent.label"
+                        t-att-aria-pressed="settings.accent === accent.value"
+                        t-on-click="() => this.onSelectAccent(accent.value)"
+                    >
+                        <i t-if="settings.accent === accent.value"
+                           class="fa fa-check"
+                           t-att-class="swatchCheckClass(accent)"/>
+                    </button>
+                </div>
+
+                <div class="dropdown-divider"/>
+                <DropdownItem onSelected="() => this.openSettings()">
+                    <i class="fa fa-fw fa-sliders me-2"/>
+                    <span>Appearance settings…</span>
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+</templates>

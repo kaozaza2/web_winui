@@ -1,0 +1,317 @@
+///============================================================================
+/// web_winui - AutoSuggestBox and TokenView (the Odoo search view)
+///
+/// The search view is an AutoSuggestBox: a TextBox with a leading search glyph,
+/// a trailing dropdown affordance, and a flyout of suggestions. The active
+/// facets are TokenView items - 24px chips with a subtle fill, a caption label
+/// and a Subtle close button.
+///
+/// Odoo styles the facets with `bg-200`, a hover overlay and `text-bg-action`;
+/// those utilities are re-pointed at Fluent tokens here rather than fought with
+/// so the markup stays untouched.
+///============================================================================
+
+.o_web_client .o_cp_searchview {
+    min-inline-size: 240px;
+    max-inline-size: 720px;
+    flex: 1 1 320px;
+    gap: 0;
+
+    // Bootstrap hangs the toggler off the end of the group as its own outlined
+    // box. Fluent puts the trailing affordance inside the control, so the
+    // toggler becomes a Subtle button sharing the field's chrome.
+    > .o_searchview_dropdown_toggler {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: var(--winui-control-height);
+        min-inline-size: var(--winui-control-height);
+        min-block-size: var(--winui-control-height);
+        margin-inline-start: -1px;
+        padding: 0;
+        border: 1px solid var(--winui-stroke-control);
+        border-inline-start: 0;
+        border-bottom-color: var(--winui-stroke-control-strong);
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+        border-start-end-radius: var(--winui-radius-control);
+        border-end-end-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-default);
+        color: var(--winui-text-secondary);
+
+        &:hover { background-color: var(--winui-control-secondary); }
+        &:active,
+        &.show { background-color: var(--winui-control-tertiary); }
+    }
+}
+
+// With a toggler attached, the field itself loses its trailing corners.
+.o_web_client .o_cp_searchview:has(> .o_searchview_dropdown_toggler) .o_searchview {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.o_web_client .o_searchview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-block-size: var(--winui-control-height);
+    padding: 2px 4px 2px 8px;
+    border: 1px solid var(--winui-stroke-control);
+    border-bottom-color: var(--winui-stroke-control-strong);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-control-default);
+    box-shadow: none;
+    transition: background-color var(--winui-dur-instant) linear,
+                border-color var(--winui-dur-instant) linear,
+                box-shadow var(--winui-dur-fast) var(--winui-ease-point);
+
+    &:hover {
+        background-color: var(--winui-control-secondary);
+    }
+
+    &:focus-within {
+        background-color: var(--winui-control-input-active);
+        border-bottom-color: var(--winui-stroke-control);
+        box-shadow: inset 0 -2px 0 0 var(--winui-accent-fill);
+    }
+
+    .o_searchview_icon {
+        color: var(--winui-text-secondary);
+        font-size: 15px;
+    }
+
+    .o_searchview_input,
+    input.o_searchview_input {
+        min-block-size: 26px;
+        padding: 0 4px;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body);
+
+        &::placeholder {
+            color: var(--winui-text-secondary);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// TokenView items: the active facets
+// ---------------------------------------------------------------------------
+.o_web_client .o_searchview_facet {
+    align-items: center;
+    block-size: 24px;
+    margin-inline-end: 4px;
+    border: 1px solid var(--winui-stroke-control);
+    border-radius: var(--winui-radius-control) !important;
+    background-color: var(--winui-control-alt-tertiary) !important;
+    color: var(--winui-text-primary);
+    overflow: hidden;
+
+    // Odoo layers a `bg-view` overlay that fades in on hover; Fluent tokens
+    // just deepen their own fill, so the overlay is retired.
+    > .position-absolute.bg-view {
+        display: none;
+    }
+
+    &:hover {
+        background-color: var(--winui-control-alt-quarternary) !important;
+    }
+
+    // Odoo marks the label up as a `.btn`, so it inherits the 32px control
+    // height and the button padding; both have to go for it to sit inside a
+    // 24px token.
+    .o_searchview_facet_label.btn,
+    .o_searchview_facet_label {
+        display: inline-flex;
+        min-block-size: 0;
+        padding-block: 0;
+        border: 0;
+        align-items: center;
+        block-size: 100%;
+        padding-inline: 6px;
+        border-radius: 0 !important;
+        background-color: var(--winui-accent-fill) !important;
+        color: var(--winui-on-accent-primary) !important;
+        font-size: var(--winui-font-caption);
+
+        &.text-bg-action,
+        &.btn-favourite {
+            background-color: var(--winui-accent-fill) !important;
+            color: var(--winui-on-accent-primary) !important;
+        }
+
+        i, small { color: inherit; }
+    }
+
+    .o_facet_values {
+        padding-inline: 6px 0;
+        font-size: var(--winui-font-caption);
+        color: var(--winui-text-primary);
+    }
+
+    .o_facet_value {
+        font-size: var(--winui-font-caption);
+    }
+
+    .o_facet_values_sep {
+        color: var(--winui-text-tertiary);
+        font-weight: 400;
+    }
+
+    .o_facet_remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 20px;
+        block-size: 20px;
+        margin-inline: 2px;
+        padding: 0 !important;
+        border-radius: var(--winui-radius-control);
+        color: var(--winui-text-secondary) !important;
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-critical) !important;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// The filter / group-by / favourites flyout
+// ---------------------------------------------------------------------------
+.o_web_client .o_search_bar_menu,
+.o_web_client .o_filter_menu,
+.o_web_client .o_group_by_menu,
+.o_web_client .o_favorite_menu {
+    .dropdown-item {
+        min-block-size: var(--winui-control-height);
+    }
+
+    .o_add_custom_filter,
+    .o_add_custom_group_by {
+        color: var(--winui-accent-text);
+    }
+}
+
+// The toggler Odoo shows on small screens.
+.o_web_client .o_searchview_dropdown_toggler,
+.o_web_client .o_toggle_searchview {
+    inline-size: var(--winui-control-height);
+    min-inline-size: var(--winui-control-height);
+}
+
+// The suggestion flyout: matched substrings are emphasised, never highlighted.
+.o_web_client .o_searchview_autocomplete {
+    .o_menu_item {
+        min-block-size: var(--winui-control-height);
+        border-radius: var(--winui-radius-control);
+
+        &.focus,
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        b { font-weight: 600; color: var(--winui-text-primary); }
+
+        .text-action,
+        .text-primary { color: var(--winui-accent-text) !important; }
+    }
+
+    .o_indent {
+        padding-inline-start: 28px;
+    }
+
+    .o_expand {
+        color: var(--winui-text-secondary);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// "Save current search"
+// ---------------------------------------------------------------------------
+// The accordion body holds a name field and two checkboxes. Odoo leans on
+// Bootstrap's default margins to space them, and this theme resets those on
+// `.form-check` and on inputs, so the spacing has to be restored here or the
+// three controls sit flush against one another.
+//
+// The checkboxes are `inline-flex`, so they need an inline gap rather than a
+// block one, and the name field needs to clear the row below it.
+.o_web_client .o_accordion_values {
+    // Only the margin: Odoo caps this field at `max-width: 17ch`, so setting a
+    // width here would be inert.
+    .o_input {
+        margin-block-end: 8px;
+    }
+
+    .o-checkbox.form-check {
+        margin-inline-end: 16px;
+        margin-block-end: 4px;
+    }
+
+    .o-checkbox.form-check:last-child {
+        margin-inline-end: 0;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Facet chip geometry
+// ---------------------------------------------------------------------------
+// The facet is a 24px TokenView chip, but two of its parts were sized against
+// other rules and broke out of it:
+//
+//   * `.o_facet_remove` is an icon-only `.btn`, so the theme's control-height
+//     floor made it 32px tall inside the 24px chip - it hung 9px below.
+//   * `.o_facet_value` is a plain block whose line box left it 7px below the
+//     chip's top and 2px past its bottom, so label and icon read as offset
+//     from one another.
+//
+// Everything here is pinned to the chip's own height instead.
+.o_web_client .o_searchview_facet {
+    align-items: center;
+
+    .o_searchview_facet_label {
+        align-self: stretch;
+    }
+
+    .o_facet_values {
+        align-items: center;
+        min-inline-size: 0;
+    }
+
+    .o_facet_value {
+        display: flex;
+        align-items: center;
+        line-height: 1.2;
+    }
+
+    .o_facet_remove {
+        flex: 0 0 auto;
+        align-self: center;
+        inline-size: 20px;
+        min-inline-size: 20px;
+        block-size: 20px;
+        min-block-size: 20px;
+        padding: 0;
+        border-radius: var(--winui-radius-control);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Flyouts on small screens
+// ---------------------------------------------------------------------------
+// A flyout is right-aligned to its toggler, so one wider than the distance from
+// the toggler's right edge to the viewport's left edge is placed at a negative
+// x and loses its leading content off-screen. Capping the width leaves the
+// positioner room to keep it on screen, and the gutter keeps it off both edges.
+//
+// `mw-100` carries `!important`, so this has to as well.
+@media (max-width: 767.98px) {
+    .o_web_client .o_popover,
+    .o_web_client .o-dropdown--menu {
+        max-inline-size: calc(100vw - 16px) !important;
+    }
+}

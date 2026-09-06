@@ -1,0 +1,252 @@
+///============================================================================
+/// web_winui - CommandBar
+///
+/// The Odoo control panel is a WinUI CommandBar sitting on the backdrop above
+/// the content layer: the page title (breadcrumb) on the leading edge, the
+/// primary commands next to it, and the secondary controls - search, pager,
+/// view switcher - on the trailing edge.
+///
+/// A CommandBar has no fill and no border; it is separated from the content
+/// only by the layer's own hairline, which is what makes the whole window read
+/// as a single Mica surface.
+///============================================================================
+
+.o_web_client .o_control_panel {
+    padding: 8px 8px 10px;
+    border: 0;
+    background: transparent;
+    color: var(--winui-text-primary);
+    gap: 8px;
+}
+
+.o_web_client .o_control_panel_main {
+    gap: 8px 16px;
+    align-items: center;
+}
+
+// ---------------------------------------------------------------------------
+// Page title
+// ---------------------------------------------------------------------------
+.o_web_client .o_control_panel_breadcrumbs {
+    gap: 4px;
+    min-block-size: var(--winui-control-height);
+
+    .o_breadcrumb,
+    .o_last_breadcrumb_item {
+        font-size: var(--winui-font-body-large);
+        line-height: calc(var(--winui-line-body-large) / var(--winui-font-body-large));
+        font-weight: 600;
+        color: var(--winui-text-primary);
+    }
+
+    // Ancestor crumbs stay at body size in the secondary colour, so the current
+    // record reads as the page title.
+    .o_breadcrumb .breadcrumb-item,
+    .breadcrumb-item:not(.active) {
+        font-size: var(--winui-font-body);
+        font-weight: 400;
+        color: var(--winui-text-secondary);
+    }
+
+    // Unsaved-changes indicator: a Fluent "caution" dot rather than a badge.
+    .o_form_status_indicator_buttons .btn,
+    .o_control_panel_status_indicator .btn {
+        inline-size: var(--winui-control-height);
+        min-inline-size: var(--winui-control-height);
+        padding: 0;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Primary commands
+// ---------------------------------------------------------------------------
+// AppBarButtons: label + optional glyph, subtle fill, 32px tall. The "New"
+// button is the one accent command, matching the single accent AppBarButton a
+// WinUI CommandBar is allowed.
+.o_web_client .o_control_panel_main_buttons {
+    gap: 4px;
+
+    // Pinned, not just floored. `min-block-size` alone lets a text button grow
+    // past the token on its own padding, so a command bar mixing text and icon
+    // buttons came out ragged - 33px next to 28px at compact density.
+    .btn {
+        block-size: var(--winui-control-height);
+        min-block-size: var(--winui-control-height);
+        padding-block: 0;
+    }
+}
+
+.o_web_client .o_control_panel_actions {
+    gap: 4px;
+
+    .btn-group {
+        gap: 0;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Trailing controls
+// ---------------------------------------------------------------------------
+.o_web_client .o_control_panel_navigation {
+    gap: 8px;
+    align-items: center;
+}
+
+// -- Pager --------------------------------------------------------------------
+// On small screens Odoo drops the inline pager counter (`t-if="!env.isSmall"`)
+// and shows `web.PagerIndicator` instead: a `position-fixed top-0 end-0` chip
+// that floats over the navbar while paging. Its Sass compiles `$o-gray-200`
+// into the fill, so in dark mode it renders as a white box - and the text
+// inside inherits this theme's light body colour, leaving it white on white.
+// It is a transient overlay, so it takes the tooltip surface.
+.o_web_client .o_pager_indicator > .o_pager_indicator_inner {
+    border: 1px solid var(--winui-stroke-flyout);
+    border-radius: var(--winui-radius-control);
+    box-shadow: var(--winui-shadow-flyout);
+    color: var(--winui-text-primary);
+    font-size: var(--winui-font-caption);
+
+    @include winui-acrylic;
+
+    .o_pager_value,
+    .o_pager_limit {
+        color: var(--winui-text-primary);
+    }
+}
+
+.o_web_client .o_cp_pager,
+.o_web_client .o_pager {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--winui-text-secondary);
+    font-size: var(--winui-font-body);
+
+    .o_pager_counter,
+    .o_pager_value,
+    .o_pager_limit {
+        color: var(--winui-text-secondary);
+    }
+
+    .o_pager_value {
+        border-radius: var(--winui-radius-control);
+        padding-inline: 4px;
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+    }
+
+    button,
+    .btn {
+        inline-size: var(--winui-control-height);
+        min-inline-size: var(--winui-control-height);
+        block-size: var(--winui-control-height);
+        padding: 0;
+        border: 0;
+        border-radius: var(--winui-radius-control);
+        background: transparent;
+        color: var(--winui-text-primary);
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+        &:active { background-color: var(--winui-subtle-tertiary); }
+    }
+}
+
+// -- View switcher = SelectorBar ----------------------------------------------
+// WinUI's SelectorBar is a row of subtle toggles; the selected one keeps the
+// accent pill. Bootstrap's `.btn-group` chrome is removed entirely.
+// Only the desktop form - a row of `.o_switch_view` toggles - becomes a
+// SelectorBar. On a small screen Odoo collapses the switcher to a single
+// dropdown button, which must stay an ordinary button.
+.o_web_client .o_cp_switch_buttons:has(.o_switch_view) {
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-control-alt-secondary);
+
+    .btn,
+    .o_switch_view {
+        position: relative;
+        inline-size: var(--winui-control-height);
+        min-inline-size: var(--winui-control-height);
+        block-size: calc(var(--winui-control-height) - 4px);
+        min-block-size: 0;
+        margin: 0;
+        padding: 0;
+        border: 0 !important;
+        border-radius: var(--winui-radius-control) !important;
+        background: transparent;
+        color: var(--winui-text-secondary);
+        box-shadow: none;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+
+        &.active {
+            background-color: var(--winui-control-default);
+            border: 1px solid var(--winui-stroke-control) !important;
+            color: var(--winui-text-primary);
+            box-shadow: var(--winui-shadow-card);
+        }
+
+        > i { font-size: 16px; }
+    }
+}
+
+// -- Embedded action chips ----------------------------------------------------
+.o_web_client .o_embedded_actions {
+    gap: 4px;
+
+    .btn {
+        min-block-size: var(--winui-control-height-sm);
+        padding: 2px 10px;
+        border-radius: var(--winui-radius-pill);
+        font-size: var(--winui-font-caption);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Form view command bar
+// ---------------------------------------------------------------------------
+// Save / discard are the only place Odoo shows a pair of opposed commands; the
+// Fluent reading is an accent primary with a standard secondary beside it.
+.o_web_client .o_form_button_save,
+.o_web_client .o_form_buttons_edit .o_form_button_save {
+    min-inline-size: 32px;
+}
+
+// ---------------------------------------------------------------------------
+// Icon-only controls in the command bar
+// ---------------------------------------------------------------------------
+// The cog menu, the collapsed button box and the view-switcher toggles all live
+// in different containers, so sizing them per-container left the bar ragged -
+// portrait rectangles of three different heights sitting next to each other.
+// One rule, keyed on "this button contains nothing but an icon", squares them
+// all to the density token.
+.o_web_client .o_control_panel {
+    .btn:has(> i:only-child),
+    .btn:has(> .fa:only-child),
+    .btn:has(> .oi:only-child),
+    .o-form-buttonbox .oe_stat_button:has(> i:only-child),
+    .o_cp_action_menus > .btn {
+        // A floor, never a fixed width: `:has(> i:only-child)` also matches
+        // a button holding an icon plus a bare text node, which would be
+        // clipped and overlap its neighbour if pinned.
+        min-inline-size: var(--winui-control-height);
+        block-size: var(--winui-control-height);
+        min-block-size: var(--winui-control-height);
+        padding: 0;
+        justify-content: center;
+        border-radius: var(--winui-radius-control);
+
+        > i,
+        > .fa,
+        > .oi,
+        > .o_button_icon {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1;
+        }
+    }
+}

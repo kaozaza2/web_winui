@@ -1,0 +1,206 @@
+///============================================================================
+/// web_winui - Kanban view = GridView of ItemContainers
+///
+/// WinUI has no kanban board, but it has the two pieces one is made of: a
+/// GridView of ItemContainers, and the column/group headers of a TreeView.
+///
+/// An ItemContainer is a card with a 4px radius, CardBackgroundFillColorDefault,
+/// a 1px CardStrokeColorDefault hairline and *no* shadow at rest; it gains the
+/// tertiary fill on hover and scales to 98% while pressed.
+///============================================================================
+
+.o_web_client .o_kanban_renderer {
+    padding: 8px;
+    background-color: transparent;
+    gap: 8px;
+}
+
+// ---------------------------------------------------------------------------
+// Columns
+// ---------------------------------------------------------------------------
+.o_web_client .o_kanban_group {
+    padding: 0 8px 8px;
+    border: 0;
+    border-radius: var(--winui-radius-overlay);
+    background-color: var(--winui-control-alt-secondary);
+
+    &.o_column_folded {
+        background-color: var(--winui-control-alt-tertiary);
+        color: var(--winui-text-secondary);
+    }
+
+    &.o_kanban_hover,
+    &.o_kanban_group_show {
+        background-color: var(--winui-control-alt-tertiary);
+    }
+}
+
+.o_web_client .o_kanban_header {
+    min-block-size: 40px;
+    padding: 8px 4px;
+    border-block-end: 1px solid var(--winui-stroke-divider);
+    background: transparent;
+    color: var(--winui-text-primary);
+
+    .o_kanban_header_title,
+    .o_column_title {
+        font-size: var(--winui-font-body);
+        font-weight: 600;
+        color: var(--winui-text-primary);
+    }
+
+    // The record count reads as an InfoBadge.
+    .o_kanban_counter_side,
+    .o_column_count {
+        min-inline-size: 20px;
+        padding-inline: 6px;
+        border-radius: var(--winui-radius-pill);
+        background-color: var(--winui-control-alt-quarternary);
+        color: var(--winui-text-secondary);
+        font-size: var(--winui-font-caption);
+        font-weight: 400;
+        text-align: center;
+    }
+
+    .o_kanban_config,
+    .o_column_unfold {
+        inline-size: var(--winui-control-height-sm);
+        block-size: var(--winui-control-height-sm);
+        border-radius: var(--winui-radius-control);
+        color: var(--winui-text-secondary);
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Records = ItemContainer
+// ---------------------------------------------------------------------------
+// Odoo paints the card with
+// `.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record):not(.o_kanban_ghost)`,
+// so the selector below has to match that weight to win on order.
+.o_web_client .o_kanban_renderer .o_kanban_record:not(.o_kanban_ghost) {
+    margin-block: 8px 0;
+    padding: 12px;
+    border: 1px solid var(--winui-stroke-card);
+    border-radius: var(--winui-radius-overlay);
+    background-color: var(--winui-layer-alt);
+    color: var(--winui-text-primary);
+    box-shadow: none;
+    transition:
+        background-color var(--winui-dur-instant) linear,
+        border-color var(--winui-dur-instant) linear,
+        box-shadow var(--winui-dur-fast) var(--winui-ease-point),
+        transform var(--winui-dur-instant) var(--winui-ease-point);
+
+    &:hover {
+        background-color: var(--winui-card-tertiary);
+        border-color: var(--winui-stroke-control-secondary);
+        box-shadow: var(--winui-shadow-card);
+    }
+
+    &:active {
+        transform: scale(.98);
+        box-shadow: none;
+    }
+
+    // Selection: the ItemContainer backplate plus a leading accent pill.
+    &.o_kanban_record_selected,
+    &.o_record_selected {
+        position: relative;
+        background-color: var(--winui-subtle-secondary);
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0;
+            inset-block: 12px;
+            inline-size: 3px;
+            border-radius: 2px;
+            background-color: var(--winui-accent-fill);
+        }
+    }
+
+    // The colour strip Odoo puts on coloured records becomes a leading bar,
+    // which is also how a Fluent list marks a category.
+    &.oe_kanban_color_0 { border-inline-start-color: var(--winui-stroke-card); }
+
+    .o_kanban_record_title,
+    .oe_kanban_details strong {
+        font-size: var(--winui-font-body);
+        font-weight: 600;
+        color: var(--winui-text-primary);
+    }
+
+    .o_kanban_record_subtitle,
+    .text-muted {
+        color: var(--winui-text-secondary);
+        font-size: var(--winui-font-caption);
+    }
+
+    .o_dropdown_kanban,
+    .o_kanban_manage_button_section {
+        .dropdown-toggle {
+            inline-size: var(--winui-control-height-sm);
+            block-size: var(--winui-control-height-sm);
+            border-radius: var(--winui-radius-control);
+            color: var(--winui-text-secondary);
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+                color: var(--winui-text-primary);
+            }
+        }
+    }
+
+    .o_kanban_image,
+    .o_kanban_image_fill,
+    img.o_kanban_image {
+        border-radius: var(--winui-radius-control);
+    }
+}
+
+// Ungrouped boards get a GridView gutter instead of column padding.
+.o_web_client .o_kanban_ungrouped {
+    gap: 12px;
+
+    .o_kanban_record {
+        margin: 0;
+    }
+}
+
+// The "quick create" card and the ghost placeholders.
+.o_web_client .o_kanban_quick_create,
+.o_web_client .o_kanban_record_quick_create {
+    border: 1px solid var(--winui-accent-fill);
+    border-radius: var(--winui-radius-overlay);
+    background-color: var(--winui-layer-alt);
+    box-shadow: var(--winui-shadow-card);
+}
+
+.o_web_client .o_kanban_ghost {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+// Dragging: WinUI lifts the dragged item with the flyout shadow.
+.o_web_client .o_kanban_record.o_dragged,
+.o_web_client .o_dragged.o_kanban_record {
+    box-shadow: var(--winui-shadow-flyout);
+    opacity: .9;
+    transform: rotate(0deg) scale(1.01);
+}
+
+// The "add a column" affordance.
+.o_web_client .o_column_quick_create {
+    .o_quick_create_folded,
+    .o_quick_create_unfolded {
+        border-radius: var(--winui-radius-overlay);
+        background-color: var(--winui-control-alt-secondary);
+        color: var(--winui-text-secondary);
+    }
+}

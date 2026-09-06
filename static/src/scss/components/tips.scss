@@ -1,0 +1,86 @@
+///============================================================================
+/// web_winui - ToolTip and TeachingTip
+///
+/// A Fluent ToolTip is a small acrylic card - 4px radius, no beak, 12px caption
+/// text, the 32px ThemeShadow - that appears after a short delay. TeachingTip
+/// (Odoo's onboarding popovers and tours) is the same surface at
+/// OverlayCornerRadius with a title, body and command row.
+///============================================================================
+
+.tooltip {
+    --bs-tooltip-bg: transparent;
+    font-size: var(--winui-font-caption);
+    opacity: 1;
+
+    .tooltip-inner {
+        max-inline-size: 340px;
+        padding: 5px 8px;
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-control);
+        box-shadow: var(--winui-shadow-tooltip);
+        color: var(--winui-text-primary);
+        text-align: start;
+        font-size: var(--winui-font-caption);
+        line-height: calc(var(--winui-line-caption) / var(--winui-font-caption));
+
+        @include winui-acrylic;
+    }
+
+    // Fluent tooltips have no arrow.
+    .tooltip-arrow { display: none; }
+}
+
+// Odoo 18 renders tooltips through the *popover* service, so the node is
+// `.o_popover.popover` and `.tooltip-inner` sits inside it. Bootstrap still
+// paints that inner node with `--tooltip-bg` (pure black) and `--tooltip-color`
+// (near-white), which showed as a hard black block inside the themed popover -
+// obvious in dark, where the popover around it is grey.
+//
+// The popover already carries the acrylic surface; the inner node only holds
+// the text.
+.o_popover .tooltip-inner {
+    max-inline-size: 340px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    color: var(--winui-text-primary);
+    text-align: start;
+
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+        background-color: transparent;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+
+// Odoo's richer field tooltips keep the surface but need room to breathe.
+.o_web_client .o-tooltip,
+.tooltip .o-tooltip {
+    text-align: start;
+
+    .o-tooltip--string,
+    .o-tooltip--technical > li > .o-tooltip--technical--title {
+        font-weight: 600;
+        color: var(--winui-text-primary);
+    }
+
+    .o-tooltip--help,
+    .o-tooltip--technical {
+        color: var(--winui-text-secondary);
+    }
+}
+
+// -- TeachingTip: tours, onboarding and Odoo's "tip" popovers ----------------
+.o_tour_pointer,
+.o_tooltip,
+.o_onboarding_step {
+    border-radius: var(--winui-radius-overlay);
+    box-shadow: var(--winui-shadow-flyout);
+}
+
+.o_tour_pointer {
+    background-color: var(--winui-accent-fill);
+    color: var(--winui-on-accent-primary);
+}

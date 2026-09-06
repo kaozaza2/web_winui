@@ -1,0 +1,438 @@
+///============================================================================
+/// web_winui - Button
+///
+/// Transcribed from controls/dev/CommonStyles/Button_themeresources.xaml:
+///
+///   Standard  rest ControlFillColorDefault   / TextFillColorPrimary
+///             hover ControlFillColorSecondary
+///             press ControlFillColorTertiary + TextFillColorSecondary
+///             border ControlElevationBorderBrush, flattening to
+///                    ControlStrokeColorDefault while pressed
+///   Accent    rest AccentFillColorDefault    / TextOnAccentFillColorPrimary
+///             hover accent @ 90%, press accent @ 80% + on-accent secondary
+///   Subtle    transparent -> SubtleFillColorSecondary -> ...Tertiary
+///
+/// The pressed state deliberately gets *lighter*, not darker: Fluent signals
+/// "pressed" by dimming the label and flattening the elevation stroke, the
+/// opposite of the Material convention Bootstrap ships with.
+///============================================================================
+
+@mixin winui-button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-block-size: var(--winui-control-height);
+    padding: 5px 11px 6px;
+    border-radius: var(--winui-radius-control);
+    border: 1px solid transparent;
+    font-size: var(--winui-font-body);
+    font-weight: 400;
+    line-height: calc(var(--winui-line-body) / var(--winui-font-body));
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background-color var(--winui-dur-instant) linear,
+        border-color var(--winui-dur-instant) linear,
+        color var(--winui-dur-instant) linear;
+
+    &:disabled,
+    &.disabled,
+    &[disabled] {
+        opacity: 1;                       // Fluent dims the tokens, not the box
+        pointer-events: none;
+    }
+}
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover,
+.dropdown-menu {
+
+    .btn {
+        @include winui-button-base;
+
+        // Bootstrap resolves a bare `.btn` through `color: var(--btn-color)`,
+        // and Odoo compiles that variable's default from `$btn-color` - the
+        // literal `#1B1B1B`. A button carrying no variant class therefore stays
+        // near-black whatever the theme does, which is invisible in dark mode;
+        // the messaging menu's "Chat" / "Channel" tabs are exactly that shape.
+        //
+        // Filling the hook fixes every such button at once. It is safe to set
+        // here: each Bootstrap variant redeclares `--btn-color` on the element
+        // itself, and an element-level declaration beats this inherited one, so
+        // `.btn-primary` and friends keep their own colours.
+        --btn-color: var(--winui-text-primary);
+        --btn-hover-color: var(--winui-text-primary);
+        --btn-active-color: var(--winui-text-primary);
+        --btn-disabled-color: var(--winui-text-disabled);
+    }
+
+    // -- Standard button ----------------------------------------------------
+    .btn-secondary,
+    .btn-outline-secondary,
+    .btn-default {
+        background-color: var(--winui-control-default);
+        border-color: var(--winui-stroke-control);
+        border-bottom-color: var(--winui-elev-border-bottom);
+        border-top-color: var(--winui-elev-border-top);
+        color: var(--winui-text-primary);
+
+        &:hover {
+            background-color: var(--winui-control-secondary);
+            border-color: var(--winui-stroke-control);
+            border-bottom-color: var(--winui-elev-border-bottom);
+            border-top-color: var(--winui-elev-border-top);
+            color: var(--winui-text-primary);
+        }
+
+        &:active,
+        &.active,
+        &:active:focus,
+        &.show {
+            background-color: var(--winui-control-tertiary);
+            border-color: var(--winui-stroke-control);
+            color: var(--winui-text-secondary);
+        }
+
+        &:disabled,
+        &.disabled {
+            background-color: var(--winui-control-disabled);
+            border-color: var(--winui-stroke-control);
+            color: var(--winui-text-disabled);
+        }
+    }
+
+    // -- Accent button ------------------------------------------------------
+    .btn-primary {
+        background-color: var(--winui-accent-fill);
+        border-color: var(--winui-stroke-on-accent);
+        border-bottom-color: var(--winui-stroke-on-accent-secondary);
+        color: var(--winui-on-accent-primary);
+
+        &:hover {
+            background-color: rgba(var(--winui-accent-fill-rgb), .9);
+            border-color: var(--winui-stroke-on-accent);
+            border-bottom-color: var(--winui-stroke-on-accent-secondary);
+            color: var(--winui-on-accent-primary);
+        }
+
+        &:active,
+        &.active,
+        &:active:focus,
+        &.show {
+            background-color: rgba(var(--winui-accent-fill-rgb), .8);
+            border-color: transparent;
+            color: var(--winui-on-accent-secondary);
+        }
+
+        &:disabled,
+        &.disabled {
+            background-color: var(--winui-control-strong-disabled);
+            border-color: transparent;
+            color: var(--winui-text-disabled);
+        }
+    }
+
+    // -- Subtle button ------------------------------------------------------
+    // Everything Odoo renders as a bare icon or a "link" action: cog menus,
+    // pagers, chatter actions, x2many row removals, view switchers.
+    .btn-light,
+    .btn-link,
+    .btn-outline-light,
+    .o_dropdown_button,
+    .btn.o_optional_columns_dropdown_toggle {
+        background-color: transparent;
+        border-color: transparent;
+        color: var(--winui-text-primary);
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            border-color: transparent;
+            color: var(--winui-text-primary);
+            text-decoration: none;
+        }
+
+        &:active,
+        &.active,
+        &.show {
+            background-color: var(--winui-subtle-tertiary);
+            border-color: transparent;
+            color: var(--winui-text-secondary);
+        }
+
+        &:disabled,
+        &.disabled {
+            background-color: transparent;
+            color: var(--winui-text-disabled);
+        }
+    }
+
+    // Odoo's `.btn-link` doubles as a real hyperlink in several places. It must
+    // take the accent *token*: Bootstrap resolves `--btn-color` from the
+    // compiled `$link-color` literal, which is frozen at the build-time accent
+    // and cannot follow either the theme or a runtime accent change.
+    .btn-link {
+        color: var(--winui-accent-text);
+
+        &:hover,
+        &:focus { color: var(--winui-accent-text); }
+    }
+
+    a.btn-link:hover,
+    .btn-link.o_winui_textual_link:hover { text-decoration: underline; }
+
+    // Command-bar icon buttons are the exception to the rule above. Odoo's own
+    // convention for them is neutral at rest and accent on hover - it compiles
+    // `.btn-link.text-action` to `color: #8D8D8D` with `#0078D4` on hover -
+    // which is also how a WinUI CommandBar behaves: a row of glyphs that stays
+    // quiet until pointed at.
+    //
+    // Two rules of this theme were overriding that and leaving every chatter
+    // icon permanently lit: the blanket `.text-action` accent in
+    // `base/typography.scss` (which carries `!important`), and the `.btn-link`
+    // accent just above, which catches the followers button because it has no
+    // `.text-action` class at all. Both are answered here - a class heavier
+    // than the blanket, and later in the bundle than either.
+    .btn-link.text-action,
+    .btn-link.btn-action,
+    .o-mail-Chatter-topbar .btn-link,
+    .o-mail-Chatter-top .btn-link,
+    .o-mail-Followers-button {
+        color: var(--winui-text-secondary) !important;
+
+        &:hover,
+        &:focus-visible,
+        &.show {
+            color: var(--winui-accent-text) !important;
+        }
+    }
+
+    // A `.btn-link` sitting inside a sentence has to behave like text. As an
+    // `inline-flex` box with `white-space: nowrap` it becomes an unbreakable
+    // block, which is what tore the invoicing alert into three columns and
+    // pushed long settings links out past their card.
+    .alert .btn-link,
+    .alert a[type="action"],
+    p .btn-link,
+    span .btn-link {
+        display: inline;
+        min-block-size: 0;
+        block-size: auto;
+        padding: 0;
+        border: 0;
+        white-space: normal;
+        vertical-align: baseline;
+        text-align: start;
+    }
+
+    // Settings links keep their icon, but must wrap instead of overflowing.
+    .o_setting_box .btn-link,
+    .o_setting_right_pane .btn-link {
+        justify-content: flex-start;
+        min-block-size: 0;
+        block-size: auto;
+        padding-inline: 0;
+        white-space: normal;
+        text-align: start;
+    }
+
+    // -- Semantic buttons ---------------------------------------------------
+    // Fluent has no coloured button variants; these follow the accent-button
+    // construction with a SystemFillColor in place of the accent.
+    @each $-name, $-fill, $-text in (
+        ("success", success, success),
+        ("danger",  critical, critical),
+        ("warning", caution, caution),
+        ("info",    neutral, primary)
+    ) {
+        .btn-#{$-name} {
+            background-color: var(--winui-fill-#{$-fill});
+            border-color: var(--winui-stroke-on-accent);
+            border-bottom-color: var(--winui-stroke-on-accent-secondary);
+            color: var(--winui-on-accent-primary);
+
+            &:hover {
+                filter: brightness(1.08);
+                color: var(--winui-on-accent-primary);
+            }
+
+            &:active,
+            &.active {
+                filter: brightness(.94);
+                color: var(--winui-on-accent-secondary);
+            }
+        }
+
+        .btn-outline-#{$-name} {
+            background-color: transparent;
+            border-color: var(--winui-fill-#{$-fill});
+            color: var(--winui-text-#{$-text});
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+                color: var(--winui-text-#{$-text});
+            }
+
+            &:active,
+            &.active {
+                background-color: var(--winui-subtle-tertiary);
+            }
+        }
+    }
+
+    // -- Sizes --------------------------------------------------------------
+    .btn-sm {
+        min-block-size: var(--winui-control-height-sm);
+        padding: 2px 8px 3px;
+        font-size: var(--winui-font-caption);
+    }
+
+    .btn-lg {
+        min-block-size: 40px;
+        padding: 8px 16px;
+        font-size: var(--winui-font-body);
+    }
+
+    // -- Icon-only buttons --------------------------------------------------
+    // WinUI keeps icon buttons square at the control height so that a row of
+    // them lines up on a 4px grid.
+    //
+    // `:only-child` matches on *elements* only - it ignores text nodes - so
+    // this also selects a button written as `<i class="fa fa-check"/> Mark
+    // Done`, which is exactly how `mail` writes the chatter's activity
+    // actions. A fixed `inline-size` therefore clipped those to 32px and their
+    // labels spilled over the button next to them.
+    //
+    // `min-inline-size` is the floor that gives the same result where the
+    // intent holds - padding is zero here, so a lone 16px glyph still lands on
+    // a 32px square - while a button that does carry a label simply grows to
+    // fit it. Bootstrap's spacing utilities (`px-2` and friends) carry
+    // `!important`, so anything Odoo explicitly padded keeps its padding.
+    .btn:has(> i:only-child),
+    .btn:has(> span.fa:only-child),
+    .btn.o_button_icon {
+        min-inline-size: var(--winui-control-height);
+        padding-inline: 0;
+    }
+
+    .btn.btn-sm:has(> i:only-child) {
+        min-inline-size: var(--winui-control-height-sm);
+    }
+
+    .btn > i,
+    .btn > .fa,
+    .btn > .oi {
+        font-size: 16px;                 // SymbolThemeFontFamily glyph size
+        line-height: 1;
+    }
+
+    // -- Groups -------------------------------------------------------------
+    // A Fluent SplitButton keeps a hairline between the halves rather than
+    // collapsing the borders the way Bootstrap does.
+    .btn-group,
+    .btn-group-sm {
+        > .btn:not(:first-child) {
+            margin-inline-start: -1px;
+        }
+
+        > .btn:focus-visible {
+            z-index: 3;
+        }
+    }
+
+    .dropdown-toggle-split {
+        padding-inline: 8px;
+        min-inline-size: 28px;
+    }
+
+    // Fluent draws a chevron, not a triangle. Scoped to the toggles that Odoo
+    // actually gives a caret to: a plain Bootstrap one, or an OWL dropdown that
+    // opted in with `.o-dropdown-caret`. Styling every `.dropdown-toggle` would
+    // re-add a caret to the icon-only toggles Odoo suppresses, which overflows
+    // their square button.
+    .dropdown-toggle:not(.o-dropdown)::after,
+    .dropdown-toggle.o-dropdown-caret::after {
+        content: "";
+        display: inline-block;
+        inline-size: 8px;
+        block-size: 8px;
+        margin-inline-start: 6px;
+        border: 0;
+        border-inline-end: 1.5px solid currentColor;
+        border-block-end: 1.5px solid currentColor;
+        transform: rotate(45deg) translate(-2px, -2px);
+        vertical-align: middle;
+        opacity: .7;
+    }
+
+    // Odoo's own opt-outs stay authoritative.
+    // Open state. Odoo flips an open caret with
+    // `.o-dropdown.o-dropdown-caret...show:after { transform: rotate(180deg) }`,
+    // which is written for a *glyph* that already points down. This caret is
+    // two borders of an empty box, so it needs 45deg to point down at all - and
+    // because `transform` is a single property, Odoo's rule replaces the whole
+    // value, losing both the correct angle and the `translate` that centres the
+    // shape inside its 8px box. The result was a caret pointing the wrong way
+    // and sitting off-centre.
+    //
+    // Odoo's selector is (0,4,0); the `:not()` here makes these (0,5,0) so they
+    // win outright rather than on file order.
+    .dropdown-toggle:not(.o-dropdown).show::after,
+    .dropdown-toggle.o-dropdown-caret:not(.o-dropdown-no-caret).show::after,
+    .o-dropdown.o-dropdown-caret:not(.o-dropdown-no-caret).show::after {
+        transform: rotate(-135deg) translate(-2px, -2px);
+    }
+
+    .dropdown-toggle.o-no-caret::after,
+    .dropdown-toggle.o-no-caret::before {
+        content: normal;
+    }
+
+    .dropdown-toggle-split::after {
+        margin-inline-start: 0;
+    }
+
+    // -- Close button -------------------------------------------------------
+    // The WinUI caption "close" button turns red on hover.
+    .btn-close {
+        inline-size: var(--winui-control-height);
+        block-size: var(--winui-control-height);
+        padding: 0;
+        border-radius: var(--winui-radius-control);
+        background: none;
+        opacity: 1;
+        color: var(--winui-text-primary);
+        position: relative;
+        transition: background-color var(--winui-dur-instant) linear,
+                    color var(--winui-dur-instant) linear;
+
+        &::before {
+            content: "\2715";            // Segoe Fluent Icons "ChromeClose"
+            font-size: 12px;
+            line-height: var(--winui-control-height);
+        }
+
+        &:hover {
+            background-color: #C42B1C;
+            color: #FFFFFF;
+        }
+
+        &:active {
+            background-color: rgba(#C42B1C, .9);
+            color: rgba(#FFFFFF, .7);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Pressed feedback
+// ---------------------------------------------------------------------------
+// WinUI scales a pressed control to 98% around its centre. `winui_pressed.js`
+// only has to toggle the class; the geometry lives here.
+.o_web_client .btn.o-winui-pressed,
+.modal .btn.o-winui-pressed {
+    transform: scale(.98);
+    transition: transform var(--winui-dur-instant) var(--winui-ease-point);
+}

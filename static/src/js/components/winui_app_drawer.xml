@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <!--
+        Replace Odoo's apps dropdown with the drawer. Only the `Dropdown` node is
+        touched, so the small-screen branch above it keeps Odoo's sidebar - the
+        drawer is reached from that sidebar's "All Apps" button instead.
+    -->
+    <t t-name="web_winui.NavBar.AppsMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//Dropdown" position="replace">
+            <button
+                class="o_winui_apps_toggle"
+                data-hotkey="h"
+                title="Home Menu"
+                aria-label="Home Menu"
+                t-on-click.stop="onWinuiAppDrawerToggle"
+            >
+                <i class="oi oi-apps"/>
+            </button>
+        </xpath>
+
+        <!--
+            Mounted outside the small-screen conditional on purpose. The drawer
+            listens for its open event on the bus, and a component only listens
+            while it is mounted - rendering it inside the desktop branch would
+            leave the mobile sidebar's "All Apps" button shouting into a void.
+        -->
+        <xpath expr="//t[@t-else]" position="after">
+            <WinuiAppDrawer/>
+        </xpath>
+    </t>
+
+    <t t-name="web_winui.AppDrawer">
+        <!--
+            Portalled to the body so the sheet is a sibling of the web client
+            rather than a descendant of the navbar, which would clip it.
+        -->
+        <t t-if="state.open" t-portal="'body'">
+            <div class="o_winui_drawer_scrim" t-on-click="() => this.close()"/>
+
+            <div class="o_winui_drawer" role="dialog" aria-modal="true" aria-label="Apps">
+
+                <!-- AutoSuggestBox -->
+                <div class="o_winui_drawer_search">
+                    <i class="fa fa-search o_winui_drawer_search_icon" aria-hidden="true"/>
+                    <input
+                        type="text"
+                        t-ref="search"
+                        class="o_winui_drawer_input"
+                        placeholder="Search apps and menus"
+                        aria-label="Search apps and menus"
+                        autocomplete="off"
+                        t-att-value="state.query"
+                        t-on-input="onSearchInput"
+                        t-on-keydown="onSearchKeydown"
+                    />
+                    <button
+                        t-if="state.query"
+                        class="o_winui_drawer_clear"
+                        title="Clear"
+                        aria-label="Clear"
+                        t-on-click="() => { this.state.query = ''; this.state.highlight = 0; }"
+                    >&#215;</button>
+                </div>
+
+                <!-- Pinned: the app grid, shown until something is typed -->
+                <t t-if="!results">
+                    <div class="o_winui_drawer_heading">Apps</div>
+                    <div class="o_winui_drawer_grid" t-ref="grid">
+                        <a
+                            t-foreach="apps"
+                            t-as="app"
+                            t-key="app.id"
+                            class="o_winui_app_tile"
+                            t-att-class="{
+                                'o_winui_drawer_highlight': app_index === state.highlight,
+                                'o_winui_app_tile_current': app.id === currentAppId,
+                            }"
+                            t-att-href="app.href"
+                            t-att-data-menu-xmlid="app.xmlid"
+                            draggable="false"
+                            t-on-click="(ev) => this.onEntryClick(ev, app)"
+                        >
+                            <span class="o_winui_app_tile_icon">
+                                <img t-if="app.iconSrc" t-att-src="app.iconSrc" t-att-alt="app.name" draggable="false"/>
+                                <i t-else="" class="oi oi-apps" aria-hidden="true"/>
+                            </span>
+                            <span class="o_winui_app_tile_name" t-att-title="app.name" t-out="app.name"/>
+                        </a>
+                    </div>
+                </t>
+
+                <!-- Results -->
+                <t t-else="">
+                    <div class="o_winui_drawer_heading">
+                        <t t-if="results.length">
+                            <t t-out="results.length"/> result<t t-if="results.length !== 1">s</t>
+                        </t>
+                        <t t-else="">No results</t>
+                    </div>
+                    <div class="o_winui_drawer_results" t-ref="results">
+                        <a
+                            t-foreach="results"
+                            t-as="entry"
+                            t-key="entry.key"
+                            class="o_winui_drawer_result"
+                            t-att-class="{
+                                'o_winui_drawer_highlight': entry_index === state.highlight,
+                                'o_winui_drawer_result_app': entry.type === 'app',
+                            }"
+                            t-att-href="entry.href"
+                            draggable="false"
+                            t-on-click="(ev) => this.onEntryClick(ev, entry.menu)"
+                        >
+                            <span class="o_winui_drawer_result_icon">
+                                <img t-if="entry.iconSrc" t-att-src="entry.iconSrc" alt="" draggable="false"/>
+                                <i t-else="" class="oi oi-chevron-right" aria-hidden="true"/>
+                            </span>
+                            <span class="o_winui_drawer_result_label">
+                                <t t-foreach="splitOnQuery(entry.label)" t-as="part" t-key="part_index">
+                                    <b t-if="part_index % 2" t-out="part"/>
+                                    <t t-else="" t-out="part"/>
+                                </t>
+                            </span>
+                        </a>
+
+                        <div t-if="!results.length" class="o_winui_drawer_empty">
+                            Nothing matches “<t t-out="state.query"/>”.
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </t>
+
+</templates>

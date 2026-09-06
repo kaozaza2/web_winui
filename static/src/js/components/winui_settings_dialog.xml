@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="web_winui.SettingsDialog">
+        <Dialog title="title" size="'md'" contentClass="'o_winui_settings_dialog'">
+            <div class="o_winui_settings">
+
+                <!-- Theme -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Choose your mode</div>
+                        <div class="o_winui_setting_help">
+                            Select which app theme to display. "Use system setting"
+                            follows your operating system.
+                        </div>
+                    </div>
+                    <select class="form-select o_winui_setting_control"
+                            t-on-change="(ev) => this.set({ theme: ev.target.value })">
+                        <option t-foreach="themes" t-as="entry" t-key="entry.value"
+                                t-att-value="entry.value"
+                                t-att-selected="settings.theme === entry.value"
+                                t-out="entry.label"/>
+                    </select>
+                </section>
+
+                <!-- Accent -->
+                <section class="o_winui_setting_card o_winui_setting_card_stacked">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Accent colour</div>
+                        <div class="o_winui_setting_help">
+                            The lighter and darker shades used across the interface are
+                            derived from this colour.
+                        </div>
+                    </div>
+                    <div class="o_winui_accent_grid">
+                        <button t-foreach="accents" t-as="accent" t-key="accent.value"
+                                type="button"
+                                class="o_winui_accent_swatch"
+                                t-att-data-accent="accent.value"
+                                t-att-class="{ 'active': settings.accent === accent.value }"
+                                t-att-title="accent.label"
+                                t-att-aria-label="accent.label"
+                                t-att-aria-pressed="settings.accent === accent.value"
+                                t-on-click="() => this.set({ accent: accent.value })">
+                            <i t-if="settings.accent === accent.value" class="fa fa-check"
+                               t-att-class="swatchCheckClass(accent)"/>
+                        </button>
+
+                        <label class="o_winui_accent_swatch o_winui_accent_custom"
+                               t-att-class="{ 'active': settings.accent === 'custom' }"
+                               title="Custom colour">
+                            <input type="color"
+                                   t-att-value="settings.accentCustom"
+                                   t-on-input="onCustomColorInput"
+                                   t-on-change="onCustomColorChange"/>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Material -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Backdrop material</div>
+                        <div class="o_winui_setting_help"
+                             t-out="materialHelp"/>
+                    </div>
+                    <select class="form-select o_winui_setting_control"
+                            t-on-change="(ev) => this.set({ material: ev.target.value })">
+                        <option t-foreach="materials" t-as="entry" t-key="entry.value"
+                                t-att-value="entry.value"
+                                t-att-selected="settings.material === entry.value"
+                                t-out="entry.label"/>
+                    </select>
+                </section>
+
+                <!-- Density -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Density</div>
+                        <div class="o_winui_setting_help"
+                             t-out="densityHelp"/>
+                    </div>
+                    <select class="form-select o_winui_setting_control"
+                            t-on-change="(ev) => this.set({ density: ev.target.value })">
+                        <option t-foreach="densities" t-as="entry" t-key="entry.value"
+                                t-att-value="entry.value"
+                                t-att-selected="settings.density === entry.value"
+                                t-out="entry.label"/>
+                    </select>
+                </section>
+
+                <!-- Corners -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Corner style</div>
+                        <div class="o_winui_setting_help">
+                            Fluent rounds controls by 4px and surfaces by 8px. Square
+                            corners reproduce the Windows 10 look.
+                        </div>
+                    </div>
+                    <select class="form-select o_winui_setting_control"
+                            t-on-change="(ev) => this.set({ corner: ev.target.value })">
+                        <option t-foreach="corners" t-as="entry" t-key="entry.value"
+                                t-att-value="entry.value"
+                                t-att-selected="settings.corner === entry.value"
+                                t-out="entry.label"/>
+                    </select>
+                </section>
+
+                <!-- Transparency -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Transparency effects</div>
+                        <div class="o_winui_setting_help">
+                            Mica and Acrylic backdrops. Turning this off uses solid
+                            surfaces instead.
+                        </div>
+                    </div>
+                    <CheckBox
+                        className="'o_boolean_toggle form-switch o_winui_setting_control'"
+                        value="settings.transparency"
+                        onChange="(value) => this.set({ transparency: value })"
+                    />
+                </section>
+
+                <!-- Motion -->
+                <section class="o_winui_setting_card">
+                    <div class="o_winui_setting_text">
+                        <div class="o_winui_setting_title">Animation effects</div>
+                        <div class="o_winui_setting_help">
+                            Fluent motion, reveal highlight and pressed feedback. This is
+                            forced off when your system asks for reduced motion.
+                        </div>
+                    </div>
+                    <CheckBox
+                        className="'o_boolean_toggle form-switch o_winui_setting_control'"
+                        value="settings.animations"
+                        onChange="(value) => this.set({ animations: value })"
+                    />
+                </section>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="onReset">Reset to defaults</button>
+                <button class="btn btn-primary" t-on-click="() => props.close()">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

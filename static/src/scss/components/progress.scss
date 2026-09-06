@@ -1,0 +1,85 @@
+///============================================================================
+/// web_winui - ProgressBar and ProgressRing
+///
+/// ProgressBar is a 1px track with a 3px accent indicator and fully rounded
+/// ends; indeterminate mode sweeps a short segment across it. ProgressRing is a
+/// 4px accent arc on a transparent ring, spinning at a constant rate.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container {
+
+    .progress {
+        block-size: 4px;
+        border-radius: var(--winui-radius-pill);
+        background-color: var(--winui-control-strong-disabled);
+        box-shadow: none;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        border-radius: var(--winui-radius-pill);
+        background-color: var(--winui-accent-fill);
+        transition: width var(--winui-dur-slow) var(--winui-ease-standard);
+    }
+
+    .progress-bar-striped { background-image: none; }
+
+    .progress-bar-animated,
+    .progress.o_indeterminate .progress-bar {
+        inline-size: 33% !important;
+        animation: winui-progress-indeterminate 2s var(--winui-ease-standard) infinite;
+    }
+}
+
+// -- ProgressRing -------------------------------------------------------------
+// Used for Odoo's loading indicator and any `.fa-spin` spinner.
+.o_web_client {
+    .o_loading_indicator,
+    .o_loading {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-overlay);
+        background-color: var(--winui-acrylic-fallback);
+        box-shadow: var(--winui-shadow-flyout);
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-caption);
+    }
+
+    .fa-spin,
+    .o_spinner {
+        animation: winui-spin 1.2s linear infinite;
+    }
+}
+
+.winui-progress-ring {
+    display: inline-block;
+    inline-size: 32px;
+    block-size: 32px;
+    border: 4px solid var(--winui-control-strong-disabled);
+    border-block-start-color: var(--winui-accent-fill);
+    border-radius: 50%;
+    animation: winui-spin .95s linear infinite;
+}
+
+// Odoo's kanban column progress bars stay 4px and use the system fills.
+.o_web_client .o_kanban_counter_progress {
+    block-size: 4px;
+    border-radius: var(--winui-radius-pill);
+    background-color: var(--winui-control-strong-disabled);
+    overflow: hidden;
+
+    .progress-bar {
+        border-radius: 0;
+
+        &.bg-success  { background-color: var(--winui-fill-success) !important; }
+        &.bg-warning  { background-color: var(--winui-fill-caution) !important; }
+        &.bg-danger   { background-color: var(--winui-fill-critical) !important; }
+        &.bg-200,
+        &.bg-secondary { background-color: var(--winui-fill-solid-neutral) !important; }
+    }
+}

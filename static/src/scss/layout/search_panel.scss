@@ -1,0 +1,125 @@
+///============================================================================
+/// web_winui - NavigationView (the Odoo search panel)
+///
+/// The search panel is a left-mode NavigationView: a 260px pane on the backdrop
+/// whose items are 36px tall, carry a 4px radius and the subtle fill ramp, and
+/// mark selection with a 3px vertical accent pill on the leading edge.
+///============================================================================
+
+.o_web_client .o_search_panel {
+    // `$o-search-panel-width` is assigned without `!default`, so it cannot be
+    // pre-empted from the variable layer; Odoo reads it through this custom
+    // property, which is the supported way in.
+    --SearchPanel-width: 260px;
+    --SearchPanel-fontSize: #{$o-font-size-base};
+    padding: 8px;
+    border: 0;
+    background-color: transparent !important;
+    color: var(--winui-text-primary);
+
+    // -- Section headers = NavigationViewItemHeader --------------------------
+    .o_search_panel_section_header {
+        padding: 12px 12px 6px;
+        color: var(--winui-text-secondary);
+        font-size: var(--winui-font-caption);
+        font-weight: 600;
+        text-transform: none;       // Fluent headers are not upper-cased
+        letter-spacing: 0;
+
+        .o_search_panel_section_icon {
+            color: var(--winui-text-tertiary) !important;
+        }
+    }
+
+    .o_search_panel_section {
+        margin-block-end: 8px;
+    }
+
+    // -- Items = NavigationViewItem -----------------------------------------
+    .o_search_panel_category_value,
+    .o_search_panel_filter_value,
+    .o_search_panel_filter_group {
+        position: relative;
+        min-block-size: var(--winui-nav-item-height);
+        margin-block-end: 2px;
+        padding: 4px 8px !important;
+        border: 0 !important;
+        border-radius: var(--winui-radius-control);
+        background-color: transparent;
+        color: var(--winui-text-primary);
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        &:active {
+            background-color: var(--winui-subtle-tertiary);
+        }
+    }
+
+    .o_search_panel_category_value.active,
+    .o_search_panel_category_value:has(> .o_search_panel_label.active),
+    .o_search_panel_category_value.o_with_counters.active {
+        background-color: var(--winui-subtle-secondary);
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0;
+            inset-block: 8px;
+            inline-size: 3px;
+            border-radius: 2px;
+            background-color: var(--winui-accent-fill);
+        }
+
+        > .o_search_panel_label {
+            font-weight: 600;
+        }
+    }
+
+    .o_search_panel_label {
+        min-block-size: 28px;
+        color: inherit;
+        font-size: var(--winui-font-body);
+    }
+
+    .o_search_panel_label_title {
+        color: inherit;
+    }
+
+    // -- Counters = InfoBadge -----------------------------------------------
+    .o_search_panel_counter {
+        min-inline-size: 20px;
+        padding-inline: 6px;
+        border-radius: var(--winui-radius-pill);
+        background-color: var(--winui-control-alt-tertiary);
+        color: var(--winui-text-secondary) !important;
+        font-size: var(--winui-font-caption);
+        font-weight: 400 !important;
+        text-align: center;
+    }
+
+    // -- Expand / collapse chevrons -----------------------------------------
+    .o_toggle_fold,
+    .o_search_panel_group_header .fa {
+        color: var(--winui-text-secondary);
+        transition: transform var(--winui-dur-fast) var(--winui-ease-standard);
+    }
+
+    // -- Resize handle -------------------------------------------------------
+    .o_search_panel_resize {
+        background-color: transparent;
+
+        &:hover {
+            background-color: var(--winui-accent-fill);
+        }
+    }
+}
+
+// The collapsed sidebar rail, i.e. NavigationView in compact mode.
+.o_web_client .o_search_panel_sidebar {
+    inline-size: 48px;                 // NavigationViewCompactPaneLength
+    background-color: transparent !important;
+    border-inline-end: 1px solid var(--winui-stroke-divider);
+}

@@ -1,0 +1,164 @@
+///============================================================================
+/// web_winui - Fluent dark-theme overrides for Odoo's own dark asset bundle
+///
+/// web_winui does not need this file to render its dark theme: the component
+/// layer is written against CSS custom properties and flips through the
+/// `data-winui-theme` attribute without recompiling anything.
+///
+/// It exists so that installations which *also* run a module compiling
+/// `web.assets_web_dark` (web_enterprise, OCA `web_dark_mode`, ...) get a dark
+/// bundle whose Odoo-generated rules already match the Fluent dark ramp,
+/// instead of a light bundle fighting the runtime dark tokens.
+///
+/// Values are the opaque equivalents of the Fluent dark ramp composited over
+/// SolidBackgroundFillColorBase (#202020), for the same reason as in the light
+/// file: Odoo runs colour maths on several of these variables.
+///============================================================================
+
+$o-webclient-color-scheme: dark;
+
+// Neutral ramp, inverted. 100 stays the "closest to the background" end so
+// that Odoo's `bg-100` / `text-900` idioms keep meaning the same thing.
+$o-gray-100: #1C1C1C;   // SolidBackgroundFillColorSecondary
+$o-gray-200: #202020;   // SolidBackgroundFillColorBase
+$o-gray-300: #333333;   // ControlStrokeColorDefault composited
+$o-gray-400: #454545;   // ControlSolidFillColorDefault
+$o-gray-500: #6B6B6B;
+$o-gray-600: #969696;   // TextFillColorTertiary  (#87FFFFFF on #202020)
+$o-gray-700: #CCCCCC;   // TextFillColorSecondary (#C5FFFFFF on #202020)
+$o-gray-800: #E6E6E6;
+$o-gray-900: #FFFFFF;   // TextFillColorPrimary
+
+$o-grays: (
+    100: $o-gray-100,
+    200: $o-gray-200,
+    300: $o-gray-300,
+    400: $o-gray-400,
+    500: $o-gray-500,
+    600: $o-gray-600,
+    700: $o-gray-700,
+    800: $o-gray-800,
+    900: $o-gray-900,
+);
+
+// On dark surfaces WinUI shifts the accent one step lighter
+// (AccentFillColorDefaultBrush uses SystemAccentColorLight2).
+$o-winui-accent: #76B9ED;
+$o-winui-accent-light-1: #A6D8FF;
+$o-winui-accent-light-2: #C6E7FF;
+$o-winui-accent-light-3: #E1F1FF;
+$o-winui-accent-dark-1: #429CE3;
+$o-winui-accent-dark-2: #0078D4;
+$o-winui-accent-dark-3: #005A9E;
+
+$o-community-color: $o-winui-accent;
+$o-enterprise-color: $o-winui-accent;
+$o-brand-odoo: $o-winui-accent;
+$o-brand-primary: $o-winui-accent;
+$o-brand-secondary: $o-gray-600;
+$o-brand-lightsecondary: $o-gray-300;
+$o-action: $o-winui-accent;
+
+// Fluent SystemFillColor* (dark theme)
+$o-success: #6CCB5F;
+$o-info: #76B9ED;
+$o-warning: #FCE100;
+$o-danger: #FF99A4;
+
+$o-theme-text-colors: (
+    "success": #6CCB5F,
+    "info": #76B9ED,
+    "warning": #FCE100,
+    "danger": #FF99A4,
+);
+
+$o-main-text-color: $o-gray-900;
+$o-main-color-muted: $o-gray-700;
+$o-main-headings-color: $o-gray-900;
+$o-main-link-color: $o-winui-accent;
+$o-main-favorite-color: #FCE100;
+$o-main-code-color: #FF99A4;
+
+$o-opacity-disabled: .3647;   // TextFillColorDisabled alpha (#5D)
+$o-opacity-muted: .7725;      // TextFillColorSecondary alpha (#C5)
+
+$o-webclient-background-color: #202020;   // SolidBackgroundFillColorBase
+$o-view-background-color: #272727;        // LayerFillColorAlt over the base
+$o-shadow-color: #000000;
+
+$o-component-active-color: $o-gray-900;
+$o-component-active-bg: rgba($o-winui-accent, .16);
+$o-component-active-border: $o-winui-accent;
+$o-form-lightsecondary: $o-gray-400;
+$o-list-group-active-color: $o-gray-900;
+$o-list-group-active-bg: rgba($o-winui-accent, .16);
+
+$o-navbar-entry-color: $o-gray-800;
+$o-navbar-entry-color--hover: $o-gray-900;
+$o-navbar-entry-bg--hover: rgba(#FFFFFF, .0605);   // SubtleFillColorSecondary
+$o-navbar-entry-color--active: $o-gray-900;
+$o-navbar-entry-bg--active: rgba(#FFFFFF, .0392);  // SubtleFillColorTertiary
+$o-navbar-brand-color: $o-gray-900;
+$o-navbar-badge-bg: $o-winui-accent;
+$o-navbar-badge-color: #000000;
+
+$o-colors: #9D9D9D, #FF99A4, #F7630C, #FCE100, #76B9ED, #B4A0FF, #F7630C,
+           #4CC2C6, #60CDFF, #FF8FD6, #6CCB5F, #CFB1FF;
+
+$o-btns-bs-override: (
+    "primary": (
+        background: $o-winui-accent,
+        border: $o-winui-accent,
+        color: #000000,
+
+        hover-background: mix($o-winui-accent, #202020, 90%),
+        hover-border: mix($o-winui-accent, #202020, 90%),
+        hover-color: #000000,
+
+        active-background: mix($o-winui-accent, #202020, 80%),
+        active-border: mix($o-winui-accent, #202020, 80%),
+        active-color: rgba(#000000, .5),
+    ),
+    "secondary": (
+        background: #333333,
+        border: #3D3D3D,
+        color: $o-gray-900,
+
+        hover-background: #383838,
+        hover-border: #3D3D3D,
+        hover-color: $o-gray-900,
+
+        active-background: #2E2E2E,
+        active-border: #3D3D3D,
+        active-color: $o-gray-700,
+    ),
+    "light": (
+        background: transparent,
+        border: transparent,
+        color: $o-gray-900,
+
+        hover-background: rgba(#FFFFFF, .0605),
+        hover-border: transparent,
+        hover-color: $o-gray-900,
+
+        active-background: rgba(#FFFFFF, .0392),
+        active-border: transparent,
+        active-color: $o-gray-700,
+    ),
+);
+
+$o-btns-bs-outline-override: (
+    "secondary": (
+        background: transparent,
+        border: $o-gray-300,
+        color: $o-gray-900,
+
+        hover-background: rgba(#FFFFFF, .0605),
+        hover-border: $o-gray-300,
+        hover-color: $o-gray-900,
+
+        active-background: rgba(#FFFFFF, .0392),
+        active-border: $o-gray-300,
+        active-color: $o-gray-700,
+    ),
+);

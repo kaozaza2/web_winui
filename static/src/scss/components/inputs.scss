@@ -1,0 +1,308 @@
+///============================================================================
+/// web_winui - TextBox, AutoSuggestBox, ComboBox
+///
+/// From controls/dev/CommonStyles/TextBox_themeresources_perf2026.xaml:
+///
+///   rest     ControlFillColorDefault, border = TextControlElevationBorderBrush
+///            (sides/top ControlStrokeColorDefault, *bottom*
+///            ControlStrongStrokeColorDefault - noticeably stronger than the
+///            stroke a Button gets)
+///   hover    ControlFillColorSecondary
+///   focused  ControlFillColorInputActive (opaque) and a 2px accent underline
+///   disabled ControlFillColorDisabled with disabled text
+///
+/// The accent underline is drawn with `box-shadow: inset 0 -2px` rather than a
+/// real border so the control does not change height when it gains focus.
+///============================================================================
+
+@mixin winui-textbox {
+    min-block-size: var(--winui-control-height);
+    padding: 4px 10px 5px;
+    border: 1px solid var(--winui-stroke-control);
+    border-bottom-color: var(--winui-stroke-control-strong);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-control-default);
+    color: var(--winui-text-primary);
+    font-size: var(--winui-font-body);
+    line-height: calc(var(--winui-line-body) / var(--winui-font-body));
+    box-shadow: none;
+    transition:
+        background-color var(--winui-dur-instant) linear,
+        border-color var(--winui-dur-instant) linear,
+        box-shadow var(--winui-dur-fast) var(--winui-ease-point);
+
+    &::placeholder {
+        color: var(--winui-text-secondary);
+        opacity: 1;
+    }
+
+    &:hover:not(:disabled):not([readonly]) {
+        background-color: var(--winui-control-secondary);
+        border-color: var(--winui-stroke-control);
+        border-bottom-color: var(--winui-stroke-control-strong);
+    }
+
+    &:focus,
+    &:focus-within {
+        background-color: var(--winui-control-input-active);
+        border-color: var(--winui-stroke-control);
+        border-bottom-color: var(--winui-stroke-control);
+        box-shadow: inset 0 -2px 0 0 var(--winui-accent-fill);
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: var(--winui-control-disabled);
+        border-color: var(--winui-stroke-control);
+        color: var(--winui-text-disabled);
+        box-shadow: none;
+    }
+
+    &::selection {
+        background-color: rgba(var(--winui-accent-fill-rgb), .4);
+    }
+}
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover {
+
+    .form-control,
+    .form-select,
+    input[type="text"],
+    input[type="search"],
+    input[type="email"],
+    input[type="url"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="time"],
+    textarea,
+    select {
+        @include winui-textbox;
+    }
+
+    textarea,
+    textarea.o_input {
+        padding-block: 6px;
+        resize: vertical;
+    }
+
+    // -- ComboBox -----------------------------------------------------------
+    // A Fluent ComboBox is a TextBox with a 12px chevron in a 30px gutter.
+    //
+    // `select.dropdown-item` is listed explicitly because Odoo renders "Add
+    // Custom Group" as a `<select>` that is also a menu item, and the menu-item
+    // rule in `components/flyouts.scss` is (0,2,0) against this rule's (0,1,1).
+    // When that rule used the `background` *shorthand* it reset `repeat`,
+    // `position` and `size` back to their initial values while the chevron
+    // image survived - so the glyph tiled across the whole 465px control as a
+    // row of chevrons. The shorthand is now colour-only; naming the compound
+    // here means a stray shorthand elsewhere cannot bring it back.
+    .form-select,
+    select,
+    select.dropdown-item,
+    select.o-dropdown-item,
+    select.o_menu_item {
+        padding-inline-end: 32px;
+        background-image: none;
+        appearance: none;
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+        // Segoe Fluent Icons "ChevronDown" traced as a path, so the glyph is
+        // present even where the font is not installed.
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23616161' stroke-width='1.2' d='M2 4.5 6 8.5l4-4'/%3E%3C/svg%3E");
+    }
+
+    // -- Odoo field widgets -------------------------------------------------
+    // `.o_input` is the class every Odoo field widget puts on its editable
+    // element, so styling it here is what carries the TextBox look into every
+    // module's form view without touching a single template.
+    .o_field_widget input.o_input,
+    .o_field_widget textarea.o_input,
+    .o_field_widget select.o_input,
+    .o_field_widget .o_input:not(div):not(span) {
+        @include winui-textbox;
+    }
+
+    // Composite widgets (many2one, date range, monetary) wrap the real input in
+    // a div that also carries the chrome. Only the outermost wrapper is drawn
+    // as the TextBox; everything inside it - at any depth - must stay bare, or
+    // the field renders as a box inside a box.
+    .o_field_widget div.o_input,
+    .o_field_widget .o_input_dropdown,
+    .o_field_widget .o_field_many2one_selection {
+        @include winui-textbox;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding-block: 0;
+
+        // The intermediate wrappers (`.o-autocomplete`, `.o_input_dropdown`
+        // nested inside `.o_field_many2one_selection`, ...) carry no chrome of
+        // their own and just pass the width through.
+        .o-autocomplete,
+        .o_input_dropdown,
+        .o_field_many2one_selection {
+            flex: 1 1 auto;
+            min-inline-size: 0;
+            min-block-size: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        input,
+        textarea,
+        .o_input {
+            flex: 1 1 auto;
+            inline-size: 100%;
+            min-block-size: calc(var(--winui-control-height) - 2px);
+            padding: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            color: inherit;
+
+            // `[readonly]` and `:disabled` are listed too: the `winui-textbox`
+            // mixin gives those states their own fill, and on a readonly
+            // many2one that painted a second, different tone *inside* the
+            // wrapper's - the field came out two-coloured.
+            &:hover,
+            &:focus,
+            &[readonly],
+            &:disabled {
+                background: transparent;
+                border: 0;
+                box-shadow: none;
+            }
+        }
+    }
+
+    // The trailing buttons of a TextBox (clear, open record, dropdown toggle)
+    // are Subtle buttons sized to the inner height.
+    .o_field_widget .o_dropdown_button,
+    .o_field_widget .o_external_button,
+    .o_field_widget .o_input_dropdown button,
+    .o_field_widget .o_field_input_buttons > button {
+        flex: 0 0 auto;
+        inline-size: 24px;
+        block-size: 24px;
+        padding: 0;
+        border: 0;
+        border-radius: var(--winui-radius-control);
+        background: transparent;
+        color: var(--winui-text-secondary);
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover { background: var(--winui-subtle-secondary); color: var(--winui-text-secondary); }
+        &:active { background: var(--winui-subtle-tertiary); color: var(--winui-text-tertiary); }
+    }
+
+    // A `<span class="o_input">` is never the editable control - the monetary
+    // widget uses one, absolutely positioned, purely to size the field. Odoo's
+    // `.o_input` rule still gives it the bottom-only underline, which landed as
+    // a full-width line under (and wider than) the real input's box.
+    .o_field_widget span.o_input,
+    .o_field_monetary span.o_input {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    // -- Required / invalid -------------------------------------------------
+    // Fluent marks an invalid field with a critical underline and never a red
+    // background wash.
+    .o_field_widget.o_required_modifier input.o_input,
+    .o_field_widget.o_required_modifier div.o_input,
+    .o_field_widget.o_required_modifier textarea.o_input {
+        border-bottom-color: var(--winui-accent-fill);
+    }
+
+    .o_field_invalid input.o_input,
+    .o_field_invalid div.o_input,
+    .o_field_invalid textarea.o_input,
+    .o_field_widget.o_field_invalid .o_input,
+    .is-invalid {
+        border-color: var(--winui-fill-critical) !important;
+        background-color: transparent !important;
+        box-shadow: inset 0 -2px 0 0 var(--winui-fill-critical) !important;
+    }
+
+    // -- Readonly fields ----------------------------------------------------
+    // A readonly Odoo field is not a disabled TextBox, it is static text, so it
+    // loses the chrome entirely - which is also what a WinUI "read-only" form
+    // does.
+    .o_form_view.o_form_readonly .o_field_widget,
+    .o_field_widget.o_readonly_modifier {
+        input.o_input,
+        div.o_input,
+        textarea.o_input {
+            border-color: transparent;
+            background: transparent;
+            box-shadow: none;
+            padding-inline: 0;
+        }
+    }
+
+    // -- Labels -------------------------------------------------------------
+    .o_form_label,
+    .form-label,
+    label {
+        font-size: var(--winui-font-body);
+        font-weight: 400;
+        color: var(--winui-text-secondary);
+        margin-block-end: 2px;
+    }
+
+    // -- Search inputs ------------------------------------------------------
+    input[type="search"]::-webkit-search-cancel-button {
+        appearance: none;
+    }
+
+    // -- Number spinners ----------------------------------------------------
+    // Fluent NumberBox hides the native spinner and shows Subtle buttons.
+    input[type="number"] {
+        appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    }
+
+    // -- Sliders ------------------------------------------------------------
+    .form-range {
+        block-size: 20px;
+
+        &::-webkit-slider-thumb {
+            border: 1px solid var(--winui-stroke-control-strong);
+            background: var(--winui-control-solid);
+            box-shadow: 0 0 0 4px var(--winui-accent-fill) inset;
+            transition: box-shadow var(--winui-dur-instant) var(--winui-ease-point);
+        }
+
+        &:hover::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--winui-accent-fill) inset; }
+        &:active::-webkit-slider-thumb { box-shadow: 0 0 0 6px var(--winui-accent-fill) inset; }
+
+        &::-moz-range-thumb {
+            border: 1px solid var(--winui-stroke-control-strong);
+            background: var(--winui-control-solid);
+            box-shadow: 0 0 0 4px var(--winui-accent-fill) inset;
+        }
+
+        &::-webkit-slider-runnable-track,
+        &::-moz-range-track {
+            block-size: 4px;
+            border-radius: 2px;
+            background: var(--winui-control-strong);
+        }
+    }
+}

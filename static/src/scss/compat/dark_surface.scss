@@ -1,0 +1,223 @@
+///============================================================================
+/// web_winui - Dark-theme surface sweep
+///
+/// The theme switches through CSS custom properties, so everything web_winui
+/// draws itself flips for free. What does *not* flip is the CSS Odoo compiled
+/// from its own Sass: those rules carry literal light colours (`#FFFFFF` from
+/// `$o-view-background-color`, `#1B1B1B` from `$o-main-text-color`, and the
+/// grays in between).
+///
+/// This file re-points those surfaces in dark mode. It is deliberately broad -
+/// it is the safety net that keeps a module the theme has never seen from
+/// showing a white panel on a dark window - and it is the last stylesheet in
+/// the bundle so it wins on order rather than on `!important` where it can.
+///============================================================================
+
+@mixin winui-dark-surface-sweep {
+
+    // -- Anything Odoo paints with the view / white background --------------
+    .o_web_client,
+    .modal,
+    .o_dialog_container {
+        .o_content,
+        .o_list_renderer,
+        .o_list_table,
+        .o_list_table > thead,
+        .o_list_table > tfoot,
+        .o_form_view,
+        .o_form_sheet_bg,
+        .o_form_sheet,
+        .o_kanban_renderer,
+        .o_calendar_renderer,
+        .o_pivot_view,
+        .o_graph_view,
+        .o_search_panel,
+        .o_content > .o_view_controller,
+        .bg-view,
+        .bg-white {
+            color: var(--winui-text-primary);
+        }
+
+        // Odoo hard-codes `background-color: white` on the view surfaces.
+        .bg-view,
+        .bg-white,
+        .o_search_panel.bg-view,
+        .o_search_panel_sidebar.bg-view {
+            background-color: var(--winui-layer-alt) !important;
+        }
+
+        // Bootstrap's own surface utilities.
+        .bg-body,
+        .bg-body-tertiary,
+        .bg-body-secondary {
+            background-color: var(--winui-solid-base) !important;
+        }
+
+        // Text utilities Odoo derives from the gray ramp.
+        .text-black,
+        .text-body {
+            color: var(--winui-text-primary) !important;
+        }
+
+        // Odoo's `.o_input` fallbacks and any bare form control a module wrote
+        // without the Odoo classes.
+        input,
+        textarea,
+        select {
+            color-scheme: dark;
+        }
+
+        // Images and iframes rendered on a white assumption (report previews,
+        // signature pads, mail bodies) keep their own light surface rather than
+        // being inverted, which would wreck logos and screenshots.
+        .o_report_layout_preview,
+        .o-mail-Message-body img,
+        iframe {
+            background-color: #FFFFFF;
+        }
+    }
+
+    // -- The exact rules that hard-code an opaque light background ----------
+    // Found by grepping the compiled bundle for opaque light fills rather than
+    // by guesswork, so the list matches what Odoo actually emits. Each selector
+    // is written to at least the weight of the Odoo rule it answers.
+    .o_web_client,
+    .modal {
+        .o_form_view.o_form_nosheet,
+        .o_form_view .o_form_nosheet,
+        // `.o_form_sheet` is deliberately absent: it is a themed card in
+        // `views/form.scss`, and forcing it transparent here would leave it
+        // with no surface at all in dark mode.
+        .o_calendar_renderer,
+        .o_calendar_renderer .o_calendar_widget .fc-more-popover.o_calendar_disabled,
+        .o_base_settings_view .o_form_renderer .o_setting_container .settings,
+        .o_base_settings_view .o_form_renderer .o_setting_container .settings .settingSearchHeader,
+        .o_kanban_renderer .o_legacy_kanban_record > div:not(.o_dropdown_kanban),
+        .o_kanban_examples_dialog .modal-body {
+            background-color: transparent;
+            color: var(--winui-text-primary);
+        }
+
+        .o_kanban_renderer .o_kanban_record:not(.o_kanban_ghost),
+        .o_kanban_renderer .o_kanban_quick_create {
+            background-color: var(--winui-layer-alt);
+        }
+
+        // The cell being edited in a list keeps the "input active" fill rather
+        // than the literal white Odoo writes there.
+        .o_list_renderer .o_list_table .o_selected_row th:focus-within,
+        .o_list_renderer .o_list_table .o_selected_row td:focus-within {
+            background-color: var(--winui-control-input-active);
+        }
+
+        // Group-header pagers inside a grouped list.
+        .o_list_renderer .o_list_table tbody > tr.o_group_header .o_pager .o_pager_previous,
+        .o_list_renderer .o_list_table tbody > tr.o_group_header .o_pager .o_pager_next {
+            background-color: transparent;
+            color: var(--winui-text-primary);
+        }
+    }
+
+    // -- Tables Odoo styles with the `table-*` variants ---------------------
+    .o_web_client .table,
+    .modal .table {
+        --table-color: var(--winui-text-primary);
+        --table-bg: transparent;
+        --table-border-color: var(--winui-stroke-divider);
+        --table-striped-color: var(--winui-text-primary);
+        --table-hover-color: var(--winui-text-primary);
+        color: var(--winui-text-primary);
+    }
+
+    // -- Code editors and other embedded light widgets ----------------------
+    .o_web_client .ace_editor {
+        background-color: var(--winui-solid-secondary);
+        color: var(--winui-text-primary);
+    }
+
+    // -- Odoo's colour-coded decorations ------------------------------------
+    // `decoration-danger` and friends resolve to the light `$o-danger` etc.;
+    // the dark SystemFillColors are considerably lighter.
+    .o_web_client,
+    .modal {
+        .text-danger, .decoration-danger { color: var(--winui-text-critical) !important; }
+        .text-success, .decoration-success { color: var(--winui-text-success) !important; }
+        .text-warning, .decoration-warning { color: var(--winui-text-caution) !important; }
+        .text-info, .decoration-info { color: var(--winui-accent-text) !important; }
+        .text-muted, .decoration-muted { color: var(--winui-text-secondary) !important; }
+    }
+
+    // -- Surfaces other modules paint opaque light ---------------------------
+    // Found by scanning the *live* DOM for elements whose own background is
+    // opaque and light while the dark theme is active. The compiled-CSS scan
+    // cannot see these: they come from `mail` and from list internals that the
+    // local test bundle does not resolve.
+    .o_web_client,
+    .modal {
+        // (The chatter's top bar is handled for both themes in `views/form.scss`,
+        // which the `mail` dependency guarantees loads after `mail`'s own CSS.)
+
+        // The list's sticky header furniture has to stay opaque, so it takes
+        // the layer tone rather than becoming transparent.
+        .o_list_table .o_list_actions_header,
+        .o_list_table .o_list_sortable_caret {
+            background-color: var(--winui-layer-solid);
+        }
+
+        // The "no colour" tag. Odoo paints it through
+        // `background-color: var(--background-color)` with a light literal, and
+        // that declaration keeps winning here despite a more specific selector
+        // and no `!important` or inline style on Odoo's side - so the override
+        // is forced. Both the element and the `::after` overlay Odoo layers on
+        // top of it have to be covered.
+        .o_tag.o_tag_color_0,
+        .o_tag.o_tag_color_0::after,
+        .o_tag:not([class*="o_tag_color_"]) {
+            --background-color: var(--winui-control-alt-tertiary);
+            background-color: var(--winui-control-alt-tertiary) !important;
+            color: var(--winui-text-primary);
+        }
+    }
+
+    // -- Coloured tags -------------------------------------------------------
+    .o_web_client,
+    .modal {
+        .o_tag[class*="o_tag_color_"]:not(.o_tag_color_0),
+        .o_tag[class*="o_tag_color_"]:not(.o_tag_color_0)::after {
+            --bg-opacity: 0.22;
+            color: var(--winui-text-primary);
+        }
+
+        // The label carries its own dark literal, so dimming the chip is not
+        // enough - it has to be flipped explicitly or it stays near-black on
+        // the now-dark tint, where it would sit at 1.74:1.
+        .o_tag .o_tag_badge_text,
+        .o_tag .o_tag_badge_text.text-truncate {
+            color: var(--winui-text-primary);
+        }
+
+        // Kanban record colour strips and colour-picker swatches must stay at
+        // full strength - they are the colour, not a backplate for text.
+        .o_colorlist button,
+        .oe_kanban_color_0,
+        [class*="oe_kanban_color_"]::after {
+            --bg-opacity: 1;
+        }
+    }
+
+    // -- Scrollbar / selection ----------------------------------------------
+    ::selection {
+        background-color: rgba(var(--winui-accent-fill-rgb), .4);
+        color: var(--winui-text-primary);
+    }
+}
+
+:root[data-winui-theme="dark"] {
+    @include winui-dark-surface-sweep;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) {
+        @include winui-dark-surface-sweep;
+    }
+}

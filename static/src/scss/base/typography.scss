@@ -1,0 +1,154 @@
+///============================================================================
+/// web_winui - The WinUI type ramp
+///
+/// Segoe UI Variable carries an optical-size axis: the "Text" optical size is
+/// meant for 12-18px, "Display" for 18px and up. Windows switches between them
+/// at 18px, which is why headings here use the Display stack while body copy
+/// uses the Text stack. `font-optical-sizing: auto` lets the variable font do
+/// the interpolation on platforms that ship it.
+///============================================================================
+
+.o_web_client,
+.o_dialog_container,
+.modal,
+.o_notification_manager,
+.tooltip,
+.popover,
+.dropdown-menu,
+.o_popover {
+    font-family: var(--winui-font-family, #{$o-font-family-sans-serif});
+    font-size: var(--winui-font-body);
+    line-height: calc(var(--winui-line-body) / var(--winui-font-body));
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color: var(--winui-text-primary);
+}
+
+// -- Headings -----------------------------------------------------------------
+// Title / Subtitle / Body Large all sit on the Display optical size and use
+// SemiBold; Fluent never uses Bold (700) for UI text.
+.o_web_client,
+.modal,
+.o_dialog_container {
+    h1, .h1,
+    h2, .h2,
+    h3, .h3,
+    h4, .h4,
+    h5, .h5,
+    h6, .h6 {
+        font-family: var(--winui-font-family-display, #{$o-headings-font-family});
+        font-weight: 600;
+        color: var(--winui-text-primary);
+        margin-bottom: .5rem;
+    }
+
+    h1, .h1 {                                  // Title
+        font-size: var(--winui-font-title);
+        line-height: calc(var(--winui-line-title) / var(--winui-font-title));
+    }
+
+    h2, .h2 {                                  // Subtitle
+        font-size: var(--winui-font-subtitle);
+        line-height: calc(var(--winui-line-subtitle) / var(--winui-font-subtitle));
+    }
+
+    h3, .h3 {                                  // Body Large
+        font-size: var(--winui-font-body-large);
+        line-height: calc(var(--winui-line-body-large) / var(--winui-font-body-large));
+    }
+
+    h4, .h4,
+    h5, .h5,
+    h6, .h6 {                                  // Body Strong
+        font-size: var(--winui-font-body);
+        line-height: calc(var(--winui-line-body) / var(--winui-font-body));
+    }
+
+    small, .small {                            // Caption
+        font-size: var(--winui-font-caption);
+        line-height: calc(var(--winui-line-caption) / var(--winui-font-caption));
+    }
+}
+
+// -- Emphasis -----------------------------------------------------------------
+// Odoo (and Bootstrap) reach for `fw-bold` / `<strong>` constantly. Remapping
+// 700 to 600 across the client is what keeps the whole UI at Fluent's
+// "BodyStrong" weight instead of a heavier grade the Segoe family renders
+// poorly at 14px.
+.o_web_client,
+.modal,
+.o_dialog_container,
+.dropdown-menu,
+.o_popover {
+    b, strong, .fw-bold, .fw-bolder, .fw-semibold, th {
+        font-weight: 600;
+    }
+
+    .text-muted,
+    .o_form_label.text-muted {
+        color: var(--winui-text-secondary) !important;
+    }
+}
+
+// -- Semantic text colours ----------------------------------------------------
+.o_web_client, .modal, .o_dialog_container {
+    .text-success { color: var(--winui-text-success) !important; }
+    .text-danger  { color: var(--winui-text-critical) !important; }
+    .text-warning { color: var(--winui-text-caution) !important; }
+    .text-info,
+    .text-primary,
+    .text-action  { color: var(--winui-accent-text) !important; }
+
+    // Only a real hyperlink gets the accent. Anything marked `role="button"` is
+    // a command rendered as an anchor - Odoo's "Add a line" row is the common
+    // case - and colouring it like a link makes it indistinguishable from the
+    // record links sitting directly above it in the same list.
+    //
+    // Menu entries, app tiles, search results and the settings rail's tabs are
+    // likewise links in markup only, and must read as text.
+    //
+    // Note the weight of this selector: every `:not()` adds the specificity of
+    // its argument, so six class exclusions make it (0,7,0) - heavier than any
+    // per-component colour rule this theme writes. Anything that needs its own
+    // link colour has to be excluded here rather than overridden later.
+    a:not(.btn):not(.dropdown-item):not(.nav-link):not([role="button"]):not(.o_winui_app_tile):not(.o_winui_drawer_result):not(.tab) {
+        color: var(--winui-accent-text);
+        text-decoration: none;
+
+        &:hover, &:focus-visible {
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+    }
+
+    code, kbd, samp, pre, .o_field_code {
+        font-family: var(--winui-font-family-mono, #{$o-font-family-monospace});
+        font-size: var(--winui-font-caption);
+    }
+
+    code {
+        color: var(--winui-text-critical);
+    }
+
+    kbd {
+        padding: 1px 5px;
+        border: 1px solid var(--winui-stroke-control-secondary);
+        border-radius: var(--winui-radius-control);
+        background: var(--winui-control-default);
+        color: var(--winui-text-primary);
+        box-shadow: none;
+    }
+}
+
+// -- Utility classes mirroring the WinUI TextBlock styles ---------------------
+// Handy when writing new Odoo templates that should sit on the ramp.
+.winui-caption        { font-size: var(--winui-font-caption); line-height: calc(var(--winui-line-caption) / var(--winui-font-caption)); font-weight: 400; }
+.winui-body           { font-size: var(--winui-font-body); line-height: calc(var(--winui-line-body) / var(--winui-font-body)); font-weight: 400; }
+.winui-body-strong    { font-size: var(--winui-font-body); line-height: calc(var(--winui-line-body) / var(--winui-font-body)); font-weight: 600; }
+.winui-body-large     { font-size: var(--winui-font-body-large); line-height: calc(var(--winui-line-body-large) / var(--winui-font-body-large)); font-weight: 400; }
+.winui-subtitle       { font-size: var(--winui-font-subtitle); line-height: calc(var(--winui-line-subtitle) / var(--winui-font-subtitle)); font-weight: 600; }
+.winui-title          { font-size: var(--winui-font-title); line-height: calc(var(--winui-line-title) / var(--winui-font-title)); font-weight: 600; }
+.winui-title-large    { font-size: var(--winui-font-title-large); font-weight: 600; }
+.winui-display        { font-size: var(--winui-font-display); font-weight: 600; }

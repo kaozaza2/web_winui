@@ -1,0 +1,252 @@
+///============================================================================
+/// web_winui - Discuss / mail compatibility
+///
+/// `mail` is by far the largest consumer of `o_*`-adjacent styling that this
+/// theme does not otherwise reach, and it paints its surfaces two ways:
+///
+///   1. Through its own CSS custom properties - seventeen `--mail-*` hooks.
+///      Every one of them is *referenced* with a light literal fallback
+///      (`var(--mail-MessagingMenu-bg, #FFFFFF)`) and *defined* nowhere, so the
+///      fallback always wins and the surfaces can never follow a theme. Filling
+///      the hooks is therefore the whole fix for that half, and it reaches
+///      components this file never names - chat windows, the composer, the
+///      Discuss sidebar, message cards.
+///
+///   2. Through hard literals, most of them carrying `!important`
+///      (`.o-mail-NotificationItem.o-important { background-color: #e7f0f7 }`).
+///      Those have to be answered selector by selector, each written one class
+///      heavier than the rule it replaces.
+///
+/// The symptom that prompted this: in dark mode the messaging menu rendered as
+/// a white sheet with pale-blue rows, and because the theme had already made
+/// body text light, every row read as white-on-white.
+///
+/// This file is theme-agnostic - it hands `mail` the same tokens the rest of
+/// the theme uses, so both light and dark follow automatically.
+///============================================================================
+
+// ---------------------------------------------------------------------------
+// 1. The hooks
+// ---------------------------------------------------------------------------
+// Set on `.o_web_client` (which is <body> in Odoo 18) so they inherit into
+// every mail component, including the ones portalled into the overlay
+// container. Purely numeric hooks - `--mail-DiscussSidebarChannel-borderOpacity`
+// and `--mail-NotificationItem-activeOutlineOpacity` - are deliberately left
+// alone; they are opacities, not colours, and Odoo's values are fine.
+.o_web_client {
+    // Surfaces. These sit inside a flyout or a pane that already carries the
+    // theme's material, so they stay transparent rather than painting a second
+    // surface on top of it.
+    --mail-MessagingMenu-bg: transparent;
+    --mail-Discuss-coreBgColor: transparent;
+    --mail-MessageCardList-cardBodyBg: var(--winui-layer-alt);
+    --mail-Composer-bg: var(--winui-control-default);
+
+    // Hover / active washes - the Fluent subtle fill ramp.
+    --mail-NavigableList-hoverBgColor: var(--winui-subtle-secondary);
+    --mail-NavigableList-activeBgColor: var(--winui-subtle-tertiary);
+    --mail-DiscussSidebar-itemActiveBgColor: var(--winui-subtle-secondary);
+    --mail-DiscussSidebarChannel-commandsHover: var(--winui-subtle-secondary);
+    --mail-DiscussNotificationSettings-btnSelectedBg: var(--winui-subtle-secondary);
+    --mail-NotificationSettings-btnHoverBg: var(--winui-subtle-secondary);
+
+    // Accents and strokes.
+    --mail-DiscussSidebar-itemActiveOutlineColor: var(--winui-accent-fill);
+    --mail-Message-actionIconHoveredColor: var(--winui-accent-text);
+    --mail-ChatWindow-commandHoverColor: var(--winui-accent-text);
+    --mail-Composer-actionHoverColor: var(--winui-accent-text);
+    --mail-DiscussSidebarSubchannel-svgColor: var(--winui-text-secondary);
+}
+
+// ---------------------------------------------------------------------------
+// 2. The literals
+// ---------------------------------------------------------------------------
+.o_web_client {
+
+    // -- Messaging menu ------------------------------------------------------
+    .o-mail-MessagingMenu,
+    .o-mail-MessagingMenu-list {
+        color: var(--winui-text-primary);
+    }
+
+    // The tab strip along the bottom ("All / Chat / Channel"). Odoo marks the
+    // active tab with `#f7f7f7`, which on a dark flyout reads as a lit panel.
+    .o-mail-MessagingMenu-navbar button.o-active,
+    .o-mail-MessagingMenu-navbar button:hover {
+        background-color: var(--winui-subtle-secondary);
+        color: var(--winui-text-primary);
+    }
+
+    .o-mail-MessagingMenu-navbar button.o-active {
+        color: var(--winui-accent-text);
+        font-weight: 600;
+    }
+
+    .o-mail-MessagingMenu-headerFilter.o-active {
+        background-color: var(--winui-subtle-secondary);
+        border-color: var(--winui-stroke-control);
+        color: var(--winui-text-primary);
+    }
+
+    // -- Notification rows ---------------------------------------------------
+    // `.o-important` is the unread highlight: `#e7f0f7 !important` with a
+    // `#d4e4f1` border. Both need forcing, and the hover/active pair that
+    // layers on top of it needs forcing one step heavier again.
+    .o-mail-NotificationItem {
+        border-color: var(--winui-stroke-divider) !important;
+        color: var(--winui-text-primary);
+    }
+
+    .o-mail-NotificationItem.o-important {
+        background-color: var(--winui-fill-attention-bg) !important;
+        border-color: var(--winui-stroke-control) !important;
+    }
+
+    .o-mail-NotificationItem:hover,
+    .o-mail-NotificationItem.o-active {
+        background-color: var(--winui-subtle-secondary) !important;
+    }
+
+    .o-mail-NotificationItem:hover.o-important,
+    .o-mail-NotificationItem.o-active.o-important {
+        background-color: var(--winui-subtle-tertiary) !important;
+    }
+
+    // The green "mark as read" check and the blue unread dot are both compiled
+    // literals picked for a white row.
+    .o-mail-NotificationItem-markAsRead {
+        color: var(--winui-text-success) !important;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary) !important;
+        }
+    }
+
+    .o-mail-NotificationItem-unreadIndicator {
+        color: var(--winui-accent-text);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 3. Message bubbles
+// ---------------------------------------------------------------------------
+// Discuss colour-codes message bubbles - blue for ordinary messages, green and
+// orange for the other kinds - and hard-codes six pastel fills with
+// `!important`, every one chosen for a white thread. Left alone they stay
+// pastel under this theme's light body text.
+//
+// The hues carry meaning, so they are re-toned rather than flattened to a
+// neutral surface. Each is published as a token whose light value is exactly
+// Odoo's literal, so light mode is unchanged, and whose dark value is the same
+// hue as a low-alpha tint over the dark ground.
+.o_web_client {
+    --winui-bubble-blue: #DFEEFA;
+    --winui-bubble-blue-muted: #EFF7FD;
+    --winui-bubble-blue-border: #B3D7F3;
+
+    --winui-bubble-green: #E1EFE1;
+    --winui-bubble-green-muted: #F0F7F0;
+    --winui-bubble-green-border: #C0DDC0;
+
+    --winui-bubble-orange: #E7D7BF;
+    --winui-bubble-orange-muted: #FBF9F5;
+    --winui-bubble-orange-border: #D9C09A;
+}
+
+@mixin winui-bubble-tints-dark {
+    .o_web_client {
+        --winui-bubble-blue: #{rgba(#54A0E2, .22)};
+        --winui-bubble-blue-muted: #{rgba(#54A0E2, .12)};
+        --winui-bubble-blue-border: #{rgba(#54A0E2, .38)};
+
+        --winui-bubble-green: #{rgba(#6CCB5F, .18)};
+        --winui-bubble-green-muted: #{rgba(#6CCB5F, .10)};
+        --winui-bubble-green-border: #{rgba(#6CCB5F, .32)};
+
+        --winui-bubble-orange: #{rgba(#EAA300, .18)};
+        --winui-bubble-orange-muted: #{rgba(#EAA300, .10)};
+        --winui-bubble-orange-border: #{rgba(#EAA300, .32)};
+    }
+}
+
+:root[data-winui-theme="dark"] { @include winui-bubble-tints-dark; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) { @include winui-bubble-tints-dark; }
+}
+
+// Odoo's rules are `!important` at (0,2,0) and (0,3,0); each of these is a
+// class heavier so it wins without escalating further.
+.o_web_client {
+    .o-mail-Message-bubble {
+        color: var(--winui-text-primary);
+    }
+
+    .o-mail-Message-bubble.o-blue {
+        background-color: var(--winui-bubble-blue) !important;
+        border-color: var(--winui-bubble-blue-border) !important;
+    }
+
+    .o-mail-Message-bubble.o-blue.o-muted {
+        background-color: var(--winui-bubble-blue-muted) !important;
+    }
+
+    .o-mail-Message-bubble.o-green {
+        background-color: var(--winui-bubble-green) !important;
+        border-color: var(--winui-bubble-green-border) !important;
+    }
+
+    .o-mail-Message-bubble.o-green.o-muted {
+        background-color: var(--winui-bubble-green-muted) !important;
+    }
+
+    .o-mail-Message-bubble.o-orange {
+        background-color: var(--winui-bubble-orange) !important;
+        border-color: var(--winui-bubble-orange-border) !important;
+    }
+
+    .o-mail-Message-bubble.o-orange.o-muted {
+        background-color: var(--winui-bubble-orange-muted) !important;
+    }
+
+    // A message rendered as a card carries a flat `#FFFFFF`. The card token is
+    // near-white in light mode, so this is a no-op there.
+    .o-mail-Message.o-card {
+        background-color: var(--winui-card-default);
+        outline-color: var(--winui-stroke-card);
+        color: var(--winui-text-primary);
+    }
+
+    // Compiled from the light accent, so it is near-black on a dark bubble.
+    .o-mail-Message-translated {
+        color: var(--winui-accent-text);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 4. The Discuss shell
+// ---------------------------------------------------------------------------
+// Discuss paints its own chrome with three flat literals, and everything else
+// in the app - the member list, the channel rows, the avatars, the status dots
+// - carries Bootstrap's `.bg-inherit` and picks up whatever those three
+// resolve to. Re-pointing the three roots is therefore enough; the
+// `.bg-inherit` chain follows on its own.
+//
+// Each selector is one class heavier than Odoo's, which are all bare
+// single-class rules.
+.o_web_client {
+    // `.o-mail-discussSidebarBgColor` is Odoo's own utility for "this is
+    // Discuss chrome" - it is on both the sidebar top and the action panel -
+    // so it is the natural place to hang the recessed layer tone.
+    .o-mail-Discuss-header,
+    .o-mail-discussSidebarBgColor {
+        background-color: var(--winui-layer-alt);
+        color: var(--winui-text-primary);
+    }
+
+    // The header's button cluster sits on the header and needs no fill of its
+    // own; its buttons carry the control ramp already.
+    .o-mail-Discuss-headerActionsGroup {
+        background-color: transparent;
+    }
+}

@@ -1,0 +1,76 @@
+///============================================================================
+/// web_winui - Fluent focus rectangle
+///
+/// WinUI never uses a blurred glow. Keyboard focus is a hard two-tone rectangle:
+/// a 2px FocusStrokeColorOuter ring with a 1px FocusStrokeColorInner ring drawn
+/// just inside it, so the marker stays visible on both light and dark fills.
+/// `outline` supplies the outer ring and an unblurred `box-shadow` the inner
+/// one; Bootstrap's own focus ring is neutralised in the variable layer.
+///============================================================================
+
+@mixin winui-focus-rect($-offset: 1px) {
+    outline: 2px solid var(--winui-focus-outer);
+    outline-offset: $-offset;
+    box-shadow: 0 0 0 1px var(--winui-focus-inner);
+}
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.dropdown-menu,
+.o_popover {
+
+    // Pointer interaction must never draw the rectangle - only keyboard focus
+    // does, which is exactly what `:focus-visible` expresses. Applying it to
+    // everything rather than to a list of components is what keeps the marker
+    // on widgets this theme has never seen.
+    :focus-visible {
+        @include winui-focus-rect;
+        z-index: 3;
+    }
+
+    // Text fields are the exception: WinUI gives a focused TextBox a 2px accent
+    // underline and *no* focus rectangle. That is not only more faithful, it is
+    // what keeps the control panel calm - Odoo focuses the search box on every
+    // page load, so a rectangle there would ring the top of every screen.
+    // `components/inputs.scss` owns the underline.
+    input:focus,
+    input:focus-visible,
+    textarea:focus,
+    textarea:focus-visible,
+    select:focus,
+    select:focus-visible,
+    [contenteditable="true"]:focus,
+    [contenteditable="true"]:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    // A focused table cell or row would otherwise be cropped by the layer's
+    // rounded corners; pulling the ring inside keeps it whole.
+    .o_data_row:focus-visible,
+    .o_data_cell:focus-visible,
+    td:focus-visible,
+    th:focus-visible {
+        outline-offset: -2px;
+    }
+}
+
+// Forced-colours / high-contrast mode: WinUI switches every stroke to the
+// system colours, so the theme steps out of the way.
+@media (forced-colors: active) {
+    .o_web_client {
+        --winui-focus-outer: Highlight;
+        --winui-focus-inner: Canvas;
+
+        .btn,
+        .o_input,
+        .form-control,
+        .dropdown-menu,
+        .modal-content,
+        .o_kanban_record,
+        .o_list_table {
+            border-color: CanvasText !important;
+        }
+    }
+}

@@ -1,0 +1,333 @@
+///============================================================================
+/// web_winui - Title bar and top NavigationView
+///
+/// The Odoo navbar plays two WinUI roles at once: the 48px title bar (app icon,
+/// app name) and a top-mode NavigationView (the current app's sections). Both
+/// are drawn directly on the Mica backdrop with no fill of their own, which is
+/// what makes a WinUI window read as one continuous surface instead of a
+/// coloured band over a page.
+///
+/// A NavigationViewItem is 36px tall, has a 4px radius, uses the subtle fill
+/// ramp, and marks selection with a 3px accent pill - horizontal underneath in
+/// top mode, vertical on the leading edge in left mode.
+///============================================================================
+
+.o_web_client .o_navbar,
+.o_web_client .o_main_navbar {
+    block-size: var(--winui-titlebar-height);
+    min-block-size: var(--winui-titlebar-height);
+    padding-inline: 8px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--winui-text-primary);
+    font-size: var(--winui-font-body);
+}
+
+.o_web_client .o_main_navbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    // Odoo colours the brand and the portalled breadcrumb with
+    // `var(--NavBar-brand-color, #1B1B1B)`. Nothing sets that hook, so the
+    // literal wins - and on a small screen, where the breadcrumb is portalled
+    // in here, it rendered near-black on the dark navbar. Filling Odoo's own
+    // hook is cleaner than out-specifying each rule.
+    --NavBar-brand-color: var(--winui-text-primary);
+    --NavBar-entry-color: var(--winui-text-primary);
+    --NavBar-entry-color--hover: var(--winui-text-primary);
+
+    // -- Every direct entry behaves like a NavigationViewItem ---------------
+    > a,
+    > button,
+    .o_nav_entry,
+    .o_menu_sections > .o-dropdown > button,
+    .o_menu_sections .dropdown-toggle,
+    .o_navbar_apps_menu button,
+    .o_menu_systray .dropdown-toggle,
+    .o_menu_systray > div > button,
+    .o_menu_systray > div > a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        block-size: var(--winui-nav-item-height);
+        min-block-size: var(--winui-nav-item-height);
+        padding-inline: 12px;
+        border: 0;
+        border-radius: var(--winui-radius-control);
+        background: transparent;
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body);
+        font-weight: 400;
+        line-height: 1;
+        text-decoration: none;
+        transition: background-color var(--winui-dur-instant) linear,
+                    color var(--winui-dur-instant) linear;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+
+        &:active,
+        &.show {
+            background-color: var(--winui-subtle-tertiary);
+            color: var(--winui-text-secondary);
+        }
+    }
+
+    // -- App launcher -------------------------------------------------------
+    // The apps button is the NavigationView pane toggle: a square Subtle button
+    // holding a single 16px glyph.
+    .o_navbar_apps_menu button,
+    .o_menu_toggle {
+        inline-size: var(--winui-nav-item-height);
+        min-inline-size: var(--winui-nav-item-height);
+        padding-inline: 0;
+        justify-content: center;
+
+        > i, > .oi, > .fa {
+            font-size: 16px;
+        }
+    }
+
+    // -- App name = the window title ---------------------------------------
+    .o_menu_brand {
+        padding-inline: 12px 8px;
+        font-size: var(--winui-font-body);
+        font-weight: 600;
+        color: var(--winui-text-primary);
+        letter-spacing: 0;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+        }
+    }
+
+    // -- Sections = top NavigationViewItems ---------------------------------
+    .o_menu_sections {
+        gap: 2px;
+        align-items: center;
+
+        .o_nav_entry,
+        > .o-dropdown > button,
+        .dropdown-toggle {
+            position: relative;
+
+            // The 3px selection pill, sliding in from the centre.
+            &::before {
+                content: "";
+                position: absolute;
+                inset-block-end: 2px;
+                inset-inline: 12px;
+                block-size: 3px;
+                border-radius: 2px;
+                background-color: var(--winui-accent-fill);
+                transform: scaleX(0);
+                opacity: 0;
+                transition: transform var(--winui-dur-fast) var(--winui-ease-decelerate),
+                            opacity var(--winui-dur-fast) linear;
+            }
+
+            &.active,
+            &.o_nav_entry_active,
+            &[aria-current="page"] {
+                font-weight: 600;
+
+                &::before {
+                    transform: scaleX(1);
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .o_menu_sections_more > .o-dropdown > button {
+        inline-size: var(--winui-nav-item-height);
+        padding-inline: 0;
+        justify-content: center;
+    }
+
+    // Odoo marks an active `.dropdown-item` with a FontAwesome tick, which the
+    // navbar reuses for its entries - there it lands as a stray glyph under the
+    // label, and the selection pill already carries the state.
+    .dropdown-item.active::before,
+    .dropdown-item.selected::before,
+    .o_nav_entry.active::after,
+    .o_menu_brand::before {
+        content: none !important;
+    }
+
+    // -- Systray = the title bar's command area -----------------------------
+    .o_menu_systray {
+        gap: 2px;
+        align-items: center;
+
+        // The InfoBadge is positioned against its own button, so each systray
+        // entry has to establish a containing block.
+        > div,
+        > div > button,
+        > div > a {
+            position: relative;
+        }
+
+        > div > button,
+        > div > a,
+        .dropdown-toggle,
+        .o_mail_systray_item,
+        .o_activity_systray_item {
+            block-size: var(--winui-nav-item-height);
+            min-inline-size: var(--winui-nav-item-height);
+            padding-inline: 8px;
+            justify-content: center;
+        }
+
+        // Systray toggles carry no chevron - they are icon buttons.
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        img.o_avatar,
+        .o_avatar img {
+            inline-size: 24px;
+            block-size: 24px;
+            border-radius: 50%;
+        }
+
+        // InfoBadge on a systray icon.
+        .badge,
+        .o_notification_counter {
+            position: absolute;
+            inset-block-start: 2px;
+            inset-inline-end: 2px;
+            min-inline-size: 16px;
+            block-size: 16px;
+            padding-inline: 4px;
+            border-radius: var(--winui-radius-pill);
+            background-color: var(--winui-accent-fill);
+            color: var(--winui-on-accent-primary);
+            font-size: 11px;
+            line-height: 16px;
+            text-shadow: none;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// The apps flyout
+// ---------------------------------------------------------------------------
+// Odoo's app launcher is a plain dropdown of names. WinUI would present it as a
+// grid of ItemContainers, so it gets the flyout surface plus generous items.
+.o_web_client .o_navbar_apps_menu .dropdown-menu,
+.o_web_client .o_navbar_apps_menu .o-dropdown--menu {
+    max-block-size: 70vh;
+
+    .dropdown-item.o_app {
+        min-block-size: 40px;
+        gap: 12px;
+        font-weight: 400;
+
+        img.o_app_icon {
+            inline-size: 24px;
+            block-size: 24px;
+            border-radius: var(--winui-radius-control);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Mobile: the app menu sidebar behaves like a NavigationView pane
+// ---------------------------------------------------------------------------
+// The pane's container is `.o_burger_menu` in Odoo 18; `.o_app_menu_sidebar`
+// only ever appears in Odoo's own selectors, never as a live class here, so
+// styling that alone silently did nothing. Both are listed: the sidebar class
+// is kept for the variants (and modules) that do render it.
+.o_burger_menu,
+.o_app_menu_sidebar {
+    max-inline-size: 90vw;
+    box-shadow: var(--winui-shadow-flyout);
+    color: var(--winui-text-primary);
+
+    @include winui-acrylic;
+
+    .o_sidebar_topbar {
+        block-size: var(--winui-titlebar-height);
+        padding-inline: 8px;
+        border-block-end: 1px solid var(--winui-stroke-divider);
+    }
+
+    .o_burger_menu_content li {
+        min-block-size: var(--winui-nav-item-height);
+        margin-inline: 4px;
+        padding-inline: 12px;
+        border-radius: var(--winui-radius-control);
+        border: 0 !important;
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+    }
+
+    // Odoo colours the entries themselves - `.o_burger_menu_content li` and
+    // `... button`, both (0,3,0) - with the compiled literal
+    // `rgba(59, 59, 59, .8)`. Because it lands on the children rather than the
+    // pane, making the container's `color` follow the theme does nothing: the
+    // entries stayed near-black on the dark acrylic. They have to be coloured
+    // directly, at matching weight.
+    .o_burger_menu_content li,
+    .o_burger_menu_content button,
+    .o_burger_menu_content a {
+        color: var(--winui-text-primary);
+    }
+
+    .o_burger_menu_content li:hover,
+    .o_burger_menu_content li:focus,
+    .o_burger_menu_content button:hover,
+    .o_burger_menu_content button:focus,
+    .o_burger_menu_content a:hover,
+    .o_burger_menu_content a:focus {
+        color: var(--winui-text-primary);
+    }
+
+    // Section captions ("Sales", "Reporting", ...) stay the stronger tone; the
+    // entries under them are secondary, as in a NavigationView.
+    .o_burger_menu_content .o_menu_entry_lvl_1,
+    .o_burger_menu_content .o_menu_entry_lvl_2,
+    .o_burger_menu_content .o_menu_entry_lvl_3 {
+        color: var(--winui-text-secondary);
+
+        &:hover,
+        &:focus {
+            color: var(--winui-text-primary);
+        }
+    }
+}
+
+// `.o_app_menu_sidebar` is a pane in its own right, docked against the content,
+// so it takes the NavigationViewOpenPaneLength and a divider on its trailing
+// edge. `.o_burger_menu` is a fixed overlay Odoo already sizes and slides in
+// from the inline-end side, so its visible edge is the *leading* one.
+.o_app_menu_sidebar {
+    inline-size: 320px;
+    border-inline-end: 1px solid var(--winui-stroke-flyout);
+}
+
+.o_burger_menu {
+    border-inline-start: 1px solid var(--winui-stroke-flyout);
+}
+
+// Odoo paints the pane's top bar and content area opaque light, and does it
+// from `.o_burger_menu .o_burger_menu_content.o_burger_menu_app` - three
+// classes, so the plain descendant selector above loses to it. The container
+// now carries the acrylic surface, so these have to be cleared or the whole
+// panel renders white in dark mode.
+.o_web_client .o_burger_menu,
+.o_web_client .o_app_menu_sidebar {
+    .o_sidebar_topbar,
+    .o_burger_menu_content,
+    .o_burger_menu_content.o_burger_menu_app,
+    .o_burger_menu_app {
+        background-color: transparent;
+        color: var(--winui-text-primary);
+    }
+}

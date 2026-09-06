@@ -1,0 +1,94 @@
+///============================================================================
+/// web_winui - The WinUI 3 scrollbar
+///
+/// Windows 11 scrollbars are "conscious": at rest they are a 2px rail that only
+/// appears while the pointer is inside the scrolling area, and they expand to a
+/// full 12px thumb with stepper buttons when the pointer approaches. The web
+/// cannot detect proximity, so the rail expands on hover over the scroller,
+/// which is the closest honest behaviour.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover,
+.dropdown-menu {
+    scrollbar-width: thin;
+    scrollbar-color: var(--winui-control-strong) transparent;
+}
+
+// WebKit / Blink get the full treatment.
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover,
+.dropdown-menu {
+    ::-webkit-scrollbar,
+    &::-webkit-scrollbar {
+        inline-size: 12px;
+        block-size: 12px;
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-thumb {
+        // The thumb is a 2px sliver until the surface is hovered; the padding
+        // trick keeps the hit target at the full 12px the whole time.
+        background-color: var(--winui-control-strong);
+        border-radius: 8px;
+        border: 5px solid transparent;
+        background-clip: content-box;
+        transition: border-width var(--winui-dur-fast) var(--winui-ease-point),
+                    background-color var(--winui-dur-fast) linear;
+    }
+
+    ::-webkit-scrollbar-corner,
+    &::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+}
+
+// Expanded state: the rail gains its acrylic backing and the thumb thickens.
+.o_web_client *:hover::-webkit-scrollbar-track,
+.o_web_client *:focus-within::-webkit-scrollbar-track,
+.modal *:hover::-webkit-scrollbar-track {
+    background: var(--winui-control-alt-secondary);
+}
+
+.o_web_client *:hover::-webkit-scrollbar-thumb,
+.o_web_client *:focus-within::-webkit-scrollbar-thumb,
+.modal *:hover::-webkit-scrollbar-thumb {
+    border-width: 3px;
+}
+
+.o_web_client ::-webkit-scrollbar-thumb:hover,
+.modal ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--winui-text-tertiary);
+    border-width: 2px;
+}
+
+.o_web_client ::-webkit-scrollbar-thumb:active,
+.modal ::-webkit-scrollbar-thumb:active {
+    background-color: var(--winui-text-secondary);
+    border-width: 2px;
+}
+
+// Overlay scrollbars inside flyouts stay minimal - WinUI never shows a track
+// inside a MenuFlyout.
+.dropdown-menu,
+.o-dropdown--menu,
+.o_popover {
+    &::-webkit-scrollbar {
+        inline-size: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-width: 2px;
+    }
+}

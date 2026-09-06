@@ -1,0 +1,153 @@
+///============================================================================
+/// web_winui - Application shell
+///
+/// A WinUI 3 window is composed of a title bar and a NavigationView whose
+/// content sits in a *layer*: a rounded, hairlined pane inset from the window
+/// edge, floating on the Mica backdrop.
+///
+/// Odoo's shell maps onto it cleanly:
+///   .o_main_navbar  -> title bar + top NavigationView
+///   .o_control_panel-> the command bar and page title, still on the backdrop
+///   .o_content      -> the content layer
+///============================================================================
+
+.o_web_client {
+    color: var(--winui-text-primary);
+    color-scheme: light;
+}
+
+:root[data-winui-theme="dark"] .o_web_client { color-scheme: dark; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) .o_web_client { color-scheme: dark; }
+}
+
+// ---------------------------------------------------------------------------
+// The content layer
+// ---------------------------------------------------------------------------
+.o_web_client > .o_action_manager > .o_action {
+    padding: 0 8px 8px;
+    gap: 0;
+}
+
+// One selector only: adding the longer `.o_action_manager > .o_action >` path
+// would give this rule a higher specificity than the board/calendar exception
+// below and silently defeat it.
+.o_web_client .o_content {
+    background-color: var(--winui-layer-alt);
+    border: 1px solid var(--winui-stroke-card);
+    border-radius: var(--winui-radius-overlay);
+    // `overflow` is deliberately not set: Odoo's layout already gives
+    // `.o_content` `overflow: auto` from a more specific selector, and that is
+    // what both scrolls the view and clips it to the layer's rounded corners.
+}
+
+// A kanban board, a calendar and a form all bring their own surfaces - columns,
+// cards, day cells, the sheet - so a layer underneath them would only be a
+// second, redundant panel. They sit straight on the backdrop instead, which is
+// also how a WinUI GridView or settings page is presented.
+//
+// For the form this matters beyond tidiness: the layer is full height by
+// definition, so it rendered as one device-tall card with both the sheet and
+// the chatter inside it. The sheet is the card now, and it is sized by its
+// content.
+.o_web_client .o_content:has(> .o_kanban_view),
+.o_web_client .o_content:has(> .o_calendar_view),
+// A form view carries `.o_action` itself and *wraps* `.o_content`, so unlike
+// the kanban board it has to be matched as an ancestor, not a child.
+.o_web_client .o_form_view > .o_content,
+.o_web_client .o_form_view .o_content {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+// Dialogs already provide their own surface; the inner layer would double up.
+.modal .o_content,
+.modal .o_action_manager > .o_action {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+// ---------------------------------------------------------------------------
+// Odoo helpers that must follow the theme
+// ---------------------------------------------------------------------------
+.o_web_client {
+    // Odoo paints "no content" screens with a large muted illustration.
+    .o_nocontent_help,
+    .o_view_nocontent {
+        color: var(--winui-text-secondary);
+
+        .o_nocontent_help_message,
+        .o_view_nocontent_smiling_face,
+        .o_view_nocontent_empty_folder {
+            color: var(--winui-text-tertiary);
+        }
+
+        p, .o_view_nocontent p {
+            color: var(--winui-text-secondary);
+        }
+    }
+
+    // Sample-data views are dimmed rather than washed out.
+    .o_view_sample_data .o_sample_data_disabled {
+        opacity: .45;
+        filter: none;
+    }
+
+    // Odoo's generic separator.
+    hr {
+        border-color: var(--winui-stroke-divider);
+        opacity: 1;
+    }
+
+    // Fullscreen / mobile chrome.
+    .o_action_manager,
+    .o_action {
+        background-color: transparent;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Utility bridges
+// ---------------------------------------------------------------------------
+// Odoo templates lean on Bootstrap's colour utilities for surfaces. Repointing
+// them at the Fluent tokens is what keeps modules the theme has never heard of
+// looking native.
+.o_web_client,
+.modal,
+.o_dialog_container {
+    .bg-white,
+    .bg-view    { background-color: var(--winui-layer-alt) !important; }
+    .bg-light,
+    .bg-100     { background-color: var(--winui-solid-tertiary) !important; }
+    .bg-200     { background-color: var(--winui-solid-secondary) !important; }
+    .bg-300     { background-color: var(--winui-control-alt-tertiary) !important; }
+    .bg-body    { background-color: var(--winui-solid-base) !important; }
+
+    .border,
+    .border-top,
+    .border-bottom,
+    .border-start,
+    .border-end,
+    .border-1,
+    .border-300,
+    .border-400 { border-color: var(--winui-stroke-divider) !important; }
+
+    .text-900,
+    .text-dark    { color: var(--winui-text-primary) !important; }
+    .text-800,
+    .text-700     { color: var(--winui-text-secondary) !important; }
+    .text-600,
+    .text-500     { color: var(--winui-text-tertiary) !important; }
+    .text-400     { color: var(--winui-text-disabled) !important; }
+
+    .shadow-sm  { box-shadow: var(--winui-shadow-card) !important; }
+    .shadow     { box-shadow: var(--winui-shadow-flyout) !important; }
+    .shadow-lg  { box-shadow: var(--winui-shadow-dialog) !important; }
+
+    .rounded    { border-radius: var(--winui-radius-control) !important; }
+    .rounded-3,
+    .rounded-4  { border-radius: var(--winui-radius-overlay) !important; }
+}

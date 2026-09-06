@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        The appearance dialog in the systray is the primary way to change these,
+        but the preferences form is where users expect to find every per-user
+        setting, so the same options are surfaced there too.
+    -->
+    <record id="view_users_form_simple_modif_winui" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.winui</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='preferences_page']" position="inside">
+                <group name="winui_appearance" string="Appearance (WinUI)">
+                    <group>
+                        <field name="winui_theme" readonly="0"/>
+                        <field name="winui_accent" readonly="0"/>
+                        <field name="winui_accent_custom"
+                               widget="color"
+                               readonly="0"
+                               invisible="winui_accent != 'custom'"/>
+                        <field name="winui_material" readonly="0"/>
+                    </group>
+                    <group>
+                        <field name="winui_density" readonly="0"/>
+                        <field name="winui_corner" readonly="0"/>
+                        <field name="winui_transparency" readonly="0"/>
+                        <field name="winui_animations" readonly="0"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_form_winui" model="ir.ui.view">
+        <field name="name">res.users.form.winui</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='preferences']" position="inside">
+                <group name="winui_appearance" string="Appearance (WinUI)">
+                    <group>
+                        <field name="winui_theme"/>
+                        <field name="winui_accent"/>
+                        <field name="winui_accent_custom"
+                               widget="color"
+                               invisible="winui_accent != 'custom'"/>
+                        <field name="winui_material"/>
+                    </group>
+                    <group>
+                        <field name="winui_density"/>
+                        <field name="winui_corner"/>
+                        <field name="winui_transparency"/>
+                        <field name="winui_animations"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

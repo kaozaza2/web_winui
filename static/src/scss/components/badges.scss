@@ -1,0 +1,127 @@
+///============================================================================
+/// web_winui - InfoBadge, TokenItem (Odoo badges and tags)
+///
+/// InfoBadge is a 16px pill in a SystemFill colour. Odoo also uses `.badge` for
+/// many2many tags and statusbar-style pills, which map onto the Fluent
+/// TokenView item: a 20px-tall rounded chip with a subtle fill, a 12px caption
+/// label and a Subtle close button.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.dropdown-menu,
+.o_popover {
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-block-size: 20px;
+        padding: 2px 8px;
+        border-radius: var(--winui-radius-control);
+        font-size: var(--winui-font-caption);
+        font-weight: 400;
+        line-height: calc(var(--winui-line-caption) / var(--winui-font-caption));
+    }
+
+    // A pill badge is just a shape - Odoo uses it for status decorations as
+    // much as for counters - so it only gets the radius here.
+    .badge.rounded-pill {
+        border-radius: var(--winui-radius-pill);
+    }
+
+    // The InfoBadge proper: a 16px accent disc holding a small number. Scoped
+    // to the counters so it never swallows a status pill.
+    .badge.o_notification_counter,
+    .badge[class*="-counter"],
+    .o_menu_systray .badge:not(.text-bg-success):not(.text-bg-danger):not(.text-bg-warning) {
+        min-inline-size: 16px;
+        block-size: 16px;
+        min-block-size: 16px;
+        padding-inline: 5px;
+        border-radius: var(--winui-radius-pill);
+        justify-content: center;
+        background-color: var(--winui-accent-fill);
+        color: var(--winui-on-accent-primary);
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    .text-bg-primary,
+    .badge.bg-primary { background-color: var(--winui-accent-fill) !important; color: var(--winui-on-accent-primary) !important; }
+    .text-bg-success,
+    .badge.bg-success { background-color: var(--winui-fill-success-bg) !important; color: var(--winui-text-success) !important; }
+    .text-bg-danger,
+    .badge.bg-danger  { background-color: var(--winui-fill-critical-bg) !important; color: var(--winui-text-critical) !important; }
+    .text-bg-warning,
+    .badge.bg-warning { background-color: var(--winui-fill-caution-bg) !important; color: var(--winui-text-caution) !important; }
+    .text-bg-secondary,
+    .badge.bg-secondary,
+    .badge.bg-light,
+    .badge.bg-200,
+    .badge.bg-300  { background-color: var(--winui-control-alt-tertiary) !important; color: var(--winui-text-primary) !important; }
+
+    // -- TokenItem: many2many tags -----------------------------------------
+    .o_tag,
+    .o_field_many2many_tags .badge,
+    .o_field_tags .o_tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        block-size: 24px;
+        padding: 0 4px 0 8px;
+        border: 1px solid var(--winui-stroke-control);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-default);
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-caption);
+        max-inline-size: 100%;
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover {
+            background-color: var(--winui-control-secondary);
+        }
+
+        .o_delete,
+        .o_tag_badge_text + .o_delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            inline-size: 16px;
+            block-size: 16px;
+            border-radius: var(--winui-radius-control);
+            color: var(--winui-text-secondary);
+            opacity: 1;
+            transition: background-color var(--winui-dur-instant) linear;
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+                color: var(--winui-text-primary);
+            }
+        }
+
+        // Odoo gives the label its own dark literal, which stops it flipping
+        // with the theme; it should simply take the chip's colour.
+        .o_tag_badge_text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: inherit;
+        }
+    }
+
+    // Coloured tags keep their hue but adopt the token geometry.
+    .o_tag.o_tag_color_0 {
+        background-color: var(--winui-control-alt-tertiary);
+    }
+
+    // -- Avatars ------------------------------------------------------------
+    // PersonPicture is always a circle.
+    .o_avatar img,
+    .o_m2o_avatar img,
+    img.o_avatar,
+    .o_field_many2many_tags_avatar img {
+        border-radius: 50%;
+        object-fit: cover;
+    }
+}

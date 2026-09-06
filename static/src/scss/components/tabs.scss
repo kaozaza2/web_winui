@@ -1,0 +1,164 @@
+///============================================================================
+/// web_winui - SelectorBar / Pivot headers (Odoo's notebook and nav-tabs)
+///
+/// A Fluent SelectorBarItem is a subtle button with a 3px accent pill under it.
+/// The pill grows in from the centre, the label switches from Body to
+/// BodyStrong when selected, and there is no box, underline strip or border
+/// around the tab strip itself.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container {
+
+    // `.o_notebook .nav` is painted opaque white by Odoo's own stylesheet,
+    // which is invisible in the light theme and a white slab in the dark one.
+    // The Fluent tab strip has no fill of its own in either.
+    .nav-tabs,
+    .o_notebook .nav,
+    .o_notebook_headers .nav {
+        gap: 4px;
+        border: 0;
+        padding-inline: 0;
+        background-color: transparent;
+    }
+
+    .nav-tabs .nav-link,
+    .o_notebook_headers .nav-link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-block-size: var(--winui-control-height);
+        padding: 6px 12px;
+        border: 0;
+        border-radius: var(--winui-radius-control);
+        background: transparent;
+        color: var(--winui-text-secondary);
+        font-weight: 400;
+        transition: background-color var(--winui-dur-instant) linear,
+                    color var(--winui-dur-instant) linear;
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset-block-end: 0;
+            inset-inline: 12px;
+            block-size: 3px;
+            border-radius: 2px;
+            background-color: var(--winui-accent-fill);
+            transform: scaleX(0);
+            opacity: 0;
+            transition: transform var(--winui-dur-fast) var(--winui-ease-decelerate),
+                        opacity var(--winui-dur-fast) linear;
+        }
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+
+        &:active {
+            background-color: var(--winui-subtle-tertiary);
+            color: var(--winui-text-secondary);
+        }
+
+        &.active {
+            background-color: transparent;
+            border: 0;
+            color: var(--winui-text-primary);
+            font-weight: 600;
+
+            &::after {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        &.disabled {
+            color: var(--winui-text-disabled);
+        }
+    }
+
+    // Vertical notebooks (settings, some x2many forms) move the pill to the
+    // leading edge, which is the NavigationView treatment.
+    .o_notebook.vertical .nav-link,
+    .flex-column > .nav-link {
+        justify-content: flex-start;
+
+        &::after {
+            inset-block: 8px;
+            inset-inline: auto;
+            inset-inline-start: 0;
+            inline-size: 3px;
+            block-size: auto;
+            transform: scaleY(0);
+        }
+
+        &.active::after {
+            transform: scaleY(1);
+        }
+    }
+
+    .tab-content {
+        padding-block-start: 12px;
+    }
+
+    // -- Pills --------------------------------------------------------------
+    .nav-pills .nav-link {
+        border-radius: var(--winui-radius-control);
+        color: var(--winui-text-primary);
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+
+        &.active {
+            background-color: var(--winui-accent-fill);
+            color: var(--winui-on-accent-primary);
+        }
+    }
+
+    // -- Breadcrumbs --------------------------------------------------------
+    // WinUI BreadcrumbBar: subtle items separated by a chevron, the last one in
+    // BodyStrong and the rest in TextFillColorSecondary.
+    .breadcrumb {
+        margin: 0;
+        gap: 2px;
+        font-size: var(--winui-font-body);
+    }
+
+    .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        color: var(--winui-text-secondary);
+
+        + .breadcrumb-item::before {
+            content: "";
+            inline-size: 6px;
+            block-size: 6px;
+            margin-inline: 6px 8px;
+            border-inline-end: 1.3px solid var(--winui-text-tertiary);
+            border-block-start: 1.3px solid var(--winui-text-tertiary);
+            transform: rotate(45deg);
+            padding: 0;
+        }
+
+        > a {
+            padding: 4px 6px;
+            border-radius: var(--winui-radius-control);
+            color: var(--winui-text-secondary);
+            text-decoration: none;
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+                color: var(--winui-text-primary);
+                text-decoration: none;
+            }
+        }
+
+        &.active,
+        &:last-child {
+            color: var(--winui-text-primary);
+            font-weight: 600;
+        }
+    }
+}

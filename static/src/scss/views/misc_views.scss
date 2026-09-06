@@ -1,0 +1,179 @@
+///============================================================================
+/// web_winui - Calendar, pivot, graph, activity and the remaining views
+///
+/// None of these has a WinUI counterpart, so they are treated the way WinUI
+/// treats data surfaces in general: a layer for the frame, DividerStroke rules,
+/// the subtle fill ramp for interaction, and the accent for "today"/selection.
+///============================================================================
+
+// ---------------------------------------------------------------------------
+// Calendar
+// ---------------------------------------------------------------------------
+.o_web_client .o_calendar_renderer,
+.o_web_client .o_calendar_view {
+    background-color: var(--winui-layer-alt);
+    color: var(--winui-text-primary);
+
+    .fc-theme-standard td,
+    .fc-theme-standard th,
+    .fc-scrollgrid,
+    .fc-theme-standard .fc-scrollgrid {
+        border-color: var(--winui-stroke-divider);
+    }
+
+    .fc-col-header-cell,
+    .fc-timegrid-axis {
+        background-color: transparent;
+        color: var(--winui-text-secondary);
+        font-size: var(--winui-font-caption);
+        font-weight: 600;
+    }
+
+    .fc-day-today {
+        background-color: rgba(var(--winui-accent-fill-rgb), .08) !important;
+    }
+
+    .fc-daygrid-day-number,
+    .fc-col-header-cell-cushion {
+        color: var(--winui-text-primary);
+        text-decoration: none;
+    }
+
+    .fc-event,
+    .fc-daygrid-event,
+    .fc-timegrid-event {
+        border: 0;
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-accent-fill);
+        color: var(--winui-on-accent-primary);
+        box-shadow: none;
+        font-size: var(--winui-font-caption);
+        padding: 2px 6px;
+    }
+
+    .fc-highlight {
+        background-color: rgba(var(--winui-accent-fill-rgb), .16);
+    }
+
+    // The mini month picker in the side panel.
+    .o_datetime_picker,
+    .o_calendar_sidebar {
+        background-color: transparent;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// DatePicker / CalendarView flyout
+// ---------------------------------------------------------------------------
+.o_web_client .o_datetime_picker,
+.o_datetime_picker {
+    padding: 8px;
+    color: var(--winui-text-primary);
+
+    .o_date_item_cell,
+    .o_datetime_button {
+        inline-size: 32px;
+        block-size: 32px;
+        border: 0;
+        border-radius: 50%;              // CalendarView days are circles
+        background: transparent;
+        color: var(--winui-text-primary);
+        transition: background-color var(--winui-dur-instant) linear;
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+
+        &.o_today {
+            background-color: var(--winui-accent-fill);
+            color: var(--winui-on-accent-primary);
+        }
+
+        &.o_selected,
+        &.o_select_start,
+        &.o_select_end {
+            border: 1px solid var(--winui-accent-fill);
+            background-color: rgba(var(--winui-accent-fill-rgb), .16);
+            color: var(--winui-text-primary);
+        }
+
+        &.o_out_of_range {
+            color: var(--winui-text-disabled);
+        }
+    }
+
+    .o_datetime_picker_header {
+        color: var(--winui-text-primary);
+        font-weight: 600;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Pivot
+// ---------------------------------------------------------------------------
+.o_web_client .o_pivot_view,
+.o_web_client .o_pivot {
+    background-color: var(--winui-layer-alt);
+    color: var(--winui-text-primary);
+
+    table {
+        border-color: var(--winui-stroke-divider);
+    }
+
+    thead th,
+    tbody th {
+        background-color: transparent;
+        border-color: var(--winui-stroke-divider);
+        color: var(--winui-text-secondary);
+        font-weight: 600;
+    }
+
+    tbody td {
+        border-color: var(--winui-stroke-divider);
+        color: var(--winui-text-primary);
+        font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:hover td,
+    .o_pivot_cell_value:hover {
+        background-color: var(--winui-subtle-secondary);
+    }
+
+    .o_pivot_header_cell_opened,
+    .o_pivot_header_cell_closed {
+        color: var(--winui-accent-text);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Graph
+// ---------------------------------------------------------------------------
+.o_web_client .o_graph_view,
+.o_web_client .o_graph_renderer {
+    background-color: var(--winui-layer-alt);
+    color: var(--winui-text-primary);
+
+    canvas {
+        background-color: transparent;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Activity view and the "no content" helpers
+// ---------------------------------------------------------------------------
+.o_web_client .o_activity_view {
+    background-color: var(--winui-layer-alt);
+
+    .o_activity_summary_cell {
+        border-color: var(--winui-stroke-divider);
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Cohort / map / gantt and any other view Odoo or a third party adds:
+// they all render inside `.o_content`, which already carries the layer, so the
+// only thing needed is to stop them painting an opaque white of their own.
+// ---------------------------------------------------------------------------
+.o_web_client .o_content > .o_view_controller {
+    background-color: transparent;
+}

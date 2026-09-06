@@ -1,0 +1,310 @@
+///============================================================================
+/// web_winui - List view = TableView
+///
+/// WinUI's TableView: a 32px column header in BodyStrong over a
+/// DividerStrokeColorDefault rule, 40px rows with horizontal rules only, hover
+/// and pressed states from the subtle fill ramp, and a selected row marked by a
+/// SubtleFillColorSecondary backplate plus a 3px accent pill on the leading
+/// edge. There are no vertical grid lines and no zebra striping.
+///============================================================================
+
+.o_web_client .o_list_renderer {
+    background-color: transparent;
+    color: var(--winui-text-primary);
+}
+
+.o_web_client .o_list_table {
+    border-color: var(--winui-stroke-divider);
+    font-size: var(--winui-font-body);
+
+    // -- Column headers -----------------------------------------------------
+    // Opaque, not `--winui-layer-alt`: the header is sticky, so a translucent
+    // fill would let the rows show through as they scroll under it.
+    > thead {
+        background-color: var(--winui-layer-solid);
+
+        > tr > th {
+            block-size: 32px;
+            padding: 6px 12px;
+            border-block-end: 1px solid var(--winui-stroke-divider);
+            border-inline: 0;
+            background-color: transparent;
+            color: var(--winui-text-secondary);
+            font-size: var(--winui-font-caption);
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+            white-space: nowrap;
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+            }
+        }
+
+        > tr > th.o_column_sortable {
+            cursor: pointer;
+
+            // The sort glyph is a 10px chevron in the accent colour, shown only
+            // once the column actually carries the sort.
+            .o_list_sortable_caret::before,
+            &.o-sort-up .o_list_sortable_caret::before,
+            &.o-sort-down .o_list_sortable_caret::before {
+                color: var(--winui-accent-text);
+            }
+        }
+
+        > tr > th.o_list_record_selector {
+            inline-size: 40px;
+            padding-inline: 12px;
+        }
+
+        // The actions column carries only the optional-columns toggle, and
+        // Odoo sets its width inline (36px) from its own column measurement,
+        // so an `inline-size` here would never apply anyway. With the generic
+        // 12px header padding it offers 12px of content box to a 26px control,
+        // leaving the button 2px outside the table - see the note by
+        // `.o_optional_columns_dropdown_toggle` below for why those 2px matter.
+        > tr > th.o_list_actions_header {
+            padding-inline: 4px;
+            text-align: center;
+        }
+    }
+
+    // The body cells of that same actions column hold the per-row delete
+    // button, so they have to be tightened to match the header - otherwise the
+    // column narrows to 32px around the toggle and the 24px trash glyph starts
+    // hanging out of it instead, moving the overflow rather than removing it.
+    // `.o_data_row` is on the selector deliberately. Without it this ties at
+    // (0,3,3) with the generic `> tbody > tr.o_data_row > td` rule further
+    // down, which sets the `padding` shorthand and therefore resets
+    // `padding-inline` - and being later in the file, it would win the tie.
+    > tbody > tr.o_data_row > td.o_list_record_remove {
+        padding-inline: 4px;
+        text-align: center;
+    }
+
+    // -- Rows ---------------------------------------------------------------
+    > tbody > tr.o_data_row {
+        block-size: var(--winui-row-height);
+        background-color: transparent;
+        transition: background-color var(--winui-dur-instant) linear;
+
+        > td.o_data_cell,
+        > td {
+            block-size: var(--winui-row-height);
+            padding: 4px 12px;
+            border-block-end: 1px solid var(--winui-stroke-divider);
+            border-inline: 0;
+            background-color: transparent;
+            color: var(--winui-text-primary);
+            vertical-align: middle;
+        }
+
+        &:hover > td {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        // -- Selected -------------------------------------------------------
+        &.o_data_row_selected,
+        &.table-info,
+        &:has(> .o_list_record_selector input:checked) {
+            > td {
+                background-color: var(--winui-subtle-secondary);
+            }
+
+            > td:first-child {
+                position: relative;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    inset-inline-start: 0;
+                    inset-block: 8px;
+                    inline-size: 3px;
+                    border-radius: 2px;
+                    background-color: var(--winui-accent-fill);
+                }
+            }
+        }
+
+        // -- Being edited ---------------------------------------------------
+        // WinUI switches a TableView row into edit mode by showing real
+        // TextBoxes; the row itself only gains the input-active fill.
+        &.o_selected_row > td {
+            background-color: var(--winui-control-input-active);
+        }
+
+        &.o_selected_row > td.o_data_cell .o_field_widget input.o_input,
+        &.o_selected_row > td.o_data_cell .o_field_widget div.o_input {
+            min-block-size: 28px;
+            padding-block: 2px;
+        }
+    }
+
+    // -- Group headers = TreeView group rows --------------------------------
+    > tbody > tr.o_group_header {
+        block-size: 36px;
+        background-color: var(--winui-control-alt-secondary);
+
+        > th,
+        > td {
+            padding: 4px 12px;
+            border-block-end: 1px solid var(--winui-stroke-divider);
+            background-color: transparent;
+            color: var(--winui-text-primary);
+            font-weight: 600;
+        }
+
+        &:hover > th,
+        &:hover > td {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        .o_group_name {
+            color: var(--winui-text-primary);
+        }
+
+        // The expand/collapse chevron rotates over 167ms, TreeView-style.
+        .o_group_caret {
+            color: var(--winui-text-secondary);
+            transition: transform var(--winui-dur-fast) var(--winui-ease-standard);
+        }
+    }
+
+    // -- Footer -------------------------------------------------------------
+    > tfoot,
+    > tfoot > tr {
+        background-color: var(--winui-layer-solid);
+
+        > td {
+            block-size: 36px;
+            padding: 6px 12px;
+            border-block-start: 1px solid var(--winui-stroke-divider);
+            border-block-end: 0;
+            background-color: transparent;
+            color: var(--winui-text-primary);
+            font-weight: 600;
+        }
+    }
+
+    // -- Numeric alignment --------------------------------------------------
+    .o_list_number,
+    .o_list_number_th {
+        font-variant-numeric: tabular-nums;
+    }
+
+    // -- Row actions --------------------------------------------------------
+    .o_list_record_remove button,
+    .o_list_record_open_form_view,
+    .o_optional_columns_dropdown_toggle {
+        inline-size: 24px;
+        block-size: 24px;
+        padding: 0;
+        border-radius: var(--winui-radius-control);
+        color: var(--winui-text-secondary);
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+    }
+
+    // -- Column resize handle -----------------------------------------------
+    .o_resize {
+        background-color: transparent;
+
+        &:hover {
+            background-color: var(--winui-accent-fill);
+        }
+    }
+
+    // -- Drag handle --------------------------------------------------------
+    .o_row_handle,
+    .o_handle_cell {
+        color: var(--winui-text-tertiary);
+    }
+}
+
+// -- Sticky header ------------------------------------------------------------
+// The layer clips its own corners, so the sticky header needs the layer fill
+// rather than a transparent background.
+.o_web_client .o_list_view .o_list_table > thead {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    background-color: var(--winui-layer-solid);
+}
+
+// ---------------------------------------------------------------------------
+// Editable rows: the control carries the state, not the cell
+// ---------------------------------------------------------------------------
+// Odoo marks a required or invalid cell in the row being edited by drawing an
+// accent (or danger) border along the whole `<td>`, plus a wash on invalid
+// cells. That predates the field having a box of its own: with a real TextBox
+// inside, the cell rule lands as a second, wider underline sitting a few pixels
+// below the control's own - the "underline overlapping the input" effect.
+//
+// Fluent puts the state on the control: a required TextBox gets an accent
+// bottom border, an invalid one a critical bottom border. The cell goes back to
+// being just a row divider.
+.o_web_client .o_list_table > tbody > tr.o_data_row.o_selected_row > td.o_data_cell {
+    &.o_required_modifier:not(.o_readonly_modifier),
+    &.o_invalid_cell:not(.o_readonly_modifier) {
+        border-block-end-color: var(--winui-stroke-divider);
+    }
+
+    // Fluent never washes an invalid field's background - the underline is the
+    // whole signal.
+    &.o_invalid_cell:not(:focus-within) {
+        background-color: transparent;
+    }
+
+    // The state the cell used to carry now belongs to the control inside it.
+    &.o_required_modifier .o_field_widget input.o_input,
+    &.o_required_modifier .o_field_widget div.o_input,
+    &.o_required_modifier .o_field_widget textarea.o_input {
+        border-bottom-color: var(--winui-accent-fill);
+    }
+
+    &.o_invalid_cell .o_field_widget input.o_input,
+    &.o_invalid_cell .o_field_widget div.o_input,
+    &.o_invalid_cell .o_field_widget textarea.o_input {
+        border-color: var(--winui-fill-critical);
+        box-shadow: inset 0 -2px 0 0 var(--winui-fill-critical);
+    }
+}
+
+// -- Selection command bar ----------------------------------------------------
+// Odoo shows a banner when rows are selected; WinUI shows a CommandBar. Same
+// idea, so it gets the flyout surface.
+.o_web_client .o_list_selection_box,
+.o_web_client .o_list_selection_box_wrapper {
+    padding: 4px 12px;
+    border: 1px solid var(--winui-stroke-card);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-fill-attention-bg);
+    color: var(--winui-text-primary);
+    font-size: var(--winui-font-caption);
+}
+
+// ---------------------------------------------------------------------------
+// Optional-columns toggle
+// ---------------------------------------------------------------------------
+// The toggle lives in a `th` that Odoo sizes to the glyph, and it is an
+// icon-only button, so the theme's 32px square floor in `components/buttons.scss`
+// applies to it. The cell does not grow to match, so the button hangs 8px past
+// the table's right edge.
+//
+// Inside a horizontally scrolling list that is not a cosmetic detail: the
+// overflow inflates the scroll container's `scrollWidth` past the table's own
+// width, so scrolling to the end stops 8px short and leaves a dead strip
+// between the last column and the card's inner edge - the "end inset". The
+// floor is therefore lifted for this one control, which is sized by its cell.
+//
+// Weight: the rule this answers is `.o_web_client .btn:has(> i:only-child)`,
+// and `:has()` contributes its argument's specificity, making it (0,3,1). The
+// selectors below are (0,4,0), so they win without `!important`.
+.o_web_client .o_list_table .btn:has(> .o_optional_columns_dropdown_toggle),
+.o_web_client .o_list_table .o_optional_columns_dropdown_toggle {
+    min-inline-size: 0;
+}

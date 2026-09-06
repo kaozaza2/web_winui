@@ -1,0 +1,77 @@
+///============================================================================
+/// web_winui - TableView / ListView chrome for plain Bootstrap tables
+///
+/// WinUI's TableView draws horizontal rules only: no vertical grid lines, no
+/// zebra striping, a 32px column header in BodyStrong, and 40px rows whose
+/// hover and selection states are the subtle fill ramp plus a 3px accent pill
+/// on the leading edge of a selected row.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container {
+
+    .table {
+        --table-bg: transparent;
+        --table-color: var(--winui-text-primary);
+        --table-border-color: var(--winui-stroke-divider);
+        --table-striped-bg: transparent;
+        --table-hover-bg: var(--winui-subtle-secondary);
+        --table-accent-bg: transparent;
+
+        color: var(--winui-text-primary);
+        border-color: var(--winui-stroke-divider);
+        font-size: var(--winui-font-body);
+
+        > :not(caption) > * > * {
+            padding: 9px 12px;
+            background-color: transparent;
+            box-shadow: none;
+            border-block-end-color: var(--winui-stroke-divider);
+        }
+
+        > thead > tr > th,
+        > thead > tr > td {
+            block-size: 32px;
+            padding-block: 6px;
+            border-block-end: 1px solid var(--winui-stroke-divider);
+            background: transparent;
+            color: var(--winui-text-secondary);
+            font-weight: 600;
+            font-size: var(--winui-font-caption);
+            text-transform: none;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        > tbody > tr {
+            transition: background-color var(--winui-dur-instant) linear;
+        }
+
+        > tbody > tr:hover > * {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        > tbody > tr > th,
+        > tbody > tr > td {
+            block-size: var(--winui-row-height);
+            vertical-align: middle;
+        }
+    }
+
+    // Bootstrap's bordered / striped variants are visual noise in Fluent; the
+    // grid keeps horizontal rules only.
+    .table-bordered > :not(caption) > * > * {
+        border-inline-width: 0;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(odd) > * {
+        --table-accent-bg: transparent;
+        background-color: transparent;
+        color: inherit;
+    }
+
+    .table-borderless > :not(caption) > * > * {
+        border-block-end-width: 0;
+    }
+}

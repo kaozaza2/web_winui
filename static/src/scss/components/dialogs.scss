@@ -1,0 +1,106 @@
+///============================================================================
+/// web_winui - ContentDialog
+///
+/// A Fluent ContentDialog is a SolidBackgroundFillColorBase card with
+/// OverlayCornerRadius, a 1px SurfaceStrokeColorFlyout hairline and the
+/// 128px-depth ThemeShadow, over a SmokeFillColorDefault scrim. The command
+/// area at the bottom sits behind a divider, uses the *secondary* background
+/// and stretches its buttons to equal widths - the primary action first.
+///
+/// Odoo dialogs are far denser than a ContentDialog, so the geometry is kept
+/// (radius, stroke, scrim, command bar) while the padding is tightened.
+///============================================================================
+
+.modal-backdrop {
+    background-color: var(--winui-smoke);
+
+    &.show { opacity: 1; }
+}
+
+.modal {
+    .modal-dialog {
+        // ContentDialogMaxWidth is 548; Odoo's dialogs host whole views, so the
+        // cap only applies to the small ones.
+        --winui-dialog-radius: var(--winui-radius-overlay);
+    }
+
+    .modal-content {
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-dialog-radius, var(--winui-radius-overlay));
+        background-color: var(--winui-solid-base);
+        background-clip: padding-box;
+        box-shadow: var(--winui-shadow-dialog);
+        color: var(--winui-text-primary);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 24px 24px 12px;
+        border: 0;
+        background: transparent;
+
+        .modal-title {
+            font-size: var(--winui-font-subtitle);
+            line-height: calc(var(--winui-line-subtitle) / var(--winui-font-subtitle));
+            font-weight: 600;
+            color: var(--winui-text-primary);
+        }
+    }
+
+    .modal-body {
+        padding: 0 24px 24px;
+        color: var(--winui-text-primary);
+    }
+
+    // The command area: a recessed strip carrying equal-width buttons.
+    .modal-footer {
+        gap: 8px;
+        padding: 24px;
+        border-block-start: 1px solid var(--winui-stroke-divider);
+        background-color: var(--winui-solid-secondary);
+
+        > .btn {
+            flex: 1 1 0;
+            min-inline-size: 130px;   // ContentDialogButtonMinWidth
+            max-inline-size: 100%;
+            margin: 0;
+        }
+
+        // Odoo footers can hold a dozen buttons; equal widths only make sense
+        // for the two or three of a real ContentDialog.
+        &:has(> .btn:nth-child(4)) > .btn {
+            flex: 0 0 auto;
+            min-inline-size: 0;
+        }
+    }
+
+    // -- Dialogs that host a full view --------------------------------------
+    // Odoo opens form and list views in modals. Those must read as an app
+    // window, not as a ContentDialog: the body gets no padding and the view
+    // brings its own layer.
+    .o_technical_modal .modal-body,
+    .modal-body:has(> .o_view_controller),
+    .modal-body:has(> .o_form_view),
+    .modal-body:has(> .o_list_view) {
+        padding: 0;
+    }
+
+    .o_dialog_container .modal-content,
+    .o_modal_full .modal-content {
+        border-radius: var(--winui-radius-overlay);
+    }
+
+    // Odoo's own "header buttons" strip inside dialogs.
+    .modal-header .btn-close {
+        margin: -8px -8px -8px auto;
+    }
+}
+
+// Stacked dialogs: WinUI dims and slightly scales the one behind, which also
+// makes Odoo's multi-modal flows readable.
+.o_dialog_container .o_inactive_modal .modal-content {
+    filter: brightness(.96);
+    transform: scale(.99);
+    transition: transform var(--winui-dur-normal) var(--winui-ease-standard),
+                filter var(--winui-dur-normal) linear;
+}

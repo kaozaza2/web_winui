@@ -1,0 +1,255 @@
+///============================================================================
+/// web_winui - Bootstrap variables that Odoo does not derive from `$o-*`
+///
+/// Injected before `web/static/src/scss/bootstrap_overridden.scss`, i.e. after
+/// the Fluent `$o-*` layer and before Bootstrap's own `_variables.scss`. Only
+/// the values Odoo does *not* already map from an `$o-*` variable belong here;
+/// everything else is driven from `winui_primary_variables.scss` so that a
+/// single edit keeps Odoo and Bootstrap in sync.
+///============================================================================
+
+// ---------------------------------------------------------------------------
+// Shape and strokes - ControlCornerRadius 4 / OverlayCornerRadius 8
+// ---------------------------------------------------------------------------
+$border-width: 1px;
+$input-btn-border-width: 1px;
+
+// ---------------------------------------------------------------------------
+// Elevation - the WinUI shadow ladder
+// ---------------------------------------------------------------------------
+// WinUI draws elevation with a ThemeShadow whose blur grows with the layer:
+// flyouts sit at 32px, dialogs at 128px. Transcribed to CSS these become a
+// tight contact shadow plus a wide ambient one.
+$box-shadow-sm: 0 1px 2px rgba($o-black, .10), 0 0 1px rgba($o-black, .07);
+$box-shadow: 0 8px 16px rgba($o-black, .14), 0 0 2px rgba($o-black, .12);
+$box-shadow-lg: 0 32px 64px rgba($o-black, .1876), 0 2px 21px rgba($o-black, .1474);
+$box-shadow-inset: inset 0 1px 2px rgba($o-black, .075);
+
+// ---------------------------------------------------------------------------
+// Focus - Fluent uses a two-tone outline, never a soft glow
+// ---------------------------------------------------------------------------
+// FocusStrokeColorOuter is a 2px dark ring, FocusStrokeColorInner a 1px light
+// ring drawn just inside it. Bootstrap's blurred ring is disabled here and
+// re-implemented as a real outline in `base/focus.scss`.
+$focus-ring-width: 0;
+$focus-ring-blur: 0;
+$focus-ring-opacity: 0;
+$focus-ring-color: transparent;
+$focus-ring-box-shadow: none;
+$input-btn-focus-width: 0;
+$input-btn-focus-color: transparent;
+$input-btn-focus-box-shadow: none;
+$btn-focus-box-shadow: none;
+$btn-active-box-shadow: none;
+$input-focus-box-shadow: none;
+$form-check-input-focus-box-shadow: none;
+$form-select-focus-box-shadow: none;
+$form-range-thumb-focus-box-shadow: none;
+$link-focus-box-shadow: none;
+
+// ---------------------------------------------------------------------------
+// Buttons - ButtonPadding 11,5,11,6 with a 32px minimum height
+// ---------------------------------------------------------------------------
+$input-btn-padding-y: o-to-rem(5px);
+$input-btn-padding-x: o-to-rem(11px);
+$input-btn-padding-y-sm: o-to-rem(2px);
+$input-btn-padding-x-sm: o-to-rem(8px);
+$input-btn-padding-y-lg: o-to-rem(8px);
+$input-btn-padding-x-lg: o-to-rem(16px);
+$input-btn-line-height: 1.4286;
+
+$btn-font-weight: 400;   // WinUI Button sets FontWeight="Normal"
+$btn-border-radius: o-to-rem(4px);
+$btn-border-radius-sm: o-to-rem(4px);
+$btn-border-radius-lg: o-to-rem(4px);
+$btn-white-space: nowrap;
+$btn-transition: background-color .0833s linear, border-color .0833s linear, color .0833s linear;
+$btn-link-decoration: none;
+$btn-link-hover-decoration: underline;
+
+// ---------------------------------------------------------------------------
+// Inputs - TextControlThemeMinHeight 32, TextControlThemePadding 10,5,6,6
+// ---------------------------------------------------------------------------
+$input-border-color: $o-gray-300;
+$input-border-radius: o-to-rem(4px);
+$input-border-radius-sm: o-to-rem(4px);
+$input-border-radius-lg: o-to-rem(4px);
+$input-color: $o-gray-900;
+$input-placeholder-color: $o-gray-600;   // TextFillColorSecondary
+$input-disabled-color: $o-gray-500;
+$input-disabled-bg: transparent;
+$input-disabled-border-color: $o-gray-300;
+$input-transition: border-color .0833s linear, background-color .0833s linear;
+
+$form-label-font-weight: 400;
+$form-label-color: $o-gray-700;
+$form-label-margin-bottom: o-to-rem(2px);
+$form-text-color: $o-gray-700;
+
+// CheckBox is a 20x20 box with a 4px radius and a 2px stroke; RadioButton is a
+// 20px circle whose 10px accent ring collapses to a 6px dot when checked.
+$form-check-input-width: o-to-rem(20px);
+$form-check-min-height: o-to-rem(20px);
+$form-check-input-border: 1px solid $o-gray-600;
+$form-check-input-border-radius: o-to-rem(4px);
+$form-check-radio-border-radius: 50%;
+$form-check-padding-start: o-to-rem(28px);
+$form-check-margin-bottom: o-to-rem(6px);
+$form-check-label-color: $o-gray-900;
+$form-check-transition: background-color .0833s linear, border-color .0833s linear;
+
+// ToggleSwitch: a 40x20 pill with a 12px knob that grows to 14x12 when pressed.
+$form-switch-width: o-to-rem(40px);
+$form-switch-padding-start: o-to-rem(48px);
+$form-switch-border-radius: o-to-rem(10px);
+$form-switch-transition: background-color .167s cubic-bezier(0, 0, 0, 1), border-color .167s cubic-bezier(0, 0, 0, 1);
+
+// Slider: a 4px rail with a 20px thumb carrying a 12px accent core.
+$form-range-track-height: o-to-rem(4px);
+$form-range-track-bg: $o-gray-400;
+$form-range-track-border-radius: o-to-rem(2px);
+$form-range-thumb-width: o-to-rem(20px);
+$form-range-thumb-height: o-to-rem(20px);
+$form-range-thumb-border: 1px solid $o-gray-300;
+$form-range-thumb-border-radius: 50%;
+$form-range-thumb-bg: #FFFFFF;
+$form-range-thumb-active-bg: #FFFFFF;
+
+// ---------------------------------------------------------------------------
+// Flyouts - OverlayCornerRadius 8, 4px inner padding, 32px item height
+// ---------------------------------------------------------------------------
+$dropdown-min-width: o-to-rem(96px);       // FlyoutThemeMinWidth
+$dropdown-padding-x: o-to-rem(4px);
+$dropdown-padding-y: o-to-rem(4px);
+$dropdown-spacer: o-to-rem(4px);
+$dropdown-border-radius: o-to-rem(8px);
+$dropdown-inner-border-radius: o-to-rem(4px);
+$dropdown-border-width: 1px;
+$dropdown-item-padding-y: o-to-rem(6px);
+$dropdown-item-padding-x: o-to-rem(12px);
+$dropdown-header-color: $o-gray-700;
+$dropdown-divider-margin-y: o-to-rem(4px);
+
+// ---------------------------------------------------------------------------
+// Surfaces
+// ---------------------------------------------------------------------------
+$card-border-radius: o-to-rem(8px);
+$card-border-color: $o-gray-300;
+$card-inner-border-radius: o-to-rem(7px);
+$card-cap-bg: transparent;
+
+$modal-content-border-radius: o-to-rem(8px);
+$modal-content-border-width: 1px;
+$modal-content-border-color: $o-gray-300;
+$modal-header-padding-y: o-to-rem(16px);
+$modal-header-padding-x: o-to-rem(24px);
+$modal-inner-padding: o-to-rem(24px);
+$modal-footer-margin-between: o-to-rem(8px);
+$modal-backdrop-bg: $o-black;
+$modal-backdrop-opacity: .3;               // SmokeFillColorDefault (#4D000000)
+$modal-fade-transform: none;
+$modal-transition: opacity .167s cubic-bezier(0, 0, 0, 1);
+
+$popover-border-radius: o-to-rem(8px);
+$popover-inner-border-radius: o-to-rem(7px);
+$popover-header-bg: transparent;
+$popover-header-padding-y: o-to-rem(12px);
+$popover-header-padding-x: o-to-rem(16px);
+$popover-body-padding-y: o-to-rem(12px);
+$popover-body-padding-x: o-to-rem(16px);
+
+// ToolTip: a small acrylic card, 4px radius, 12px caption text.
+$tooltip-border-radius: o-to-rem(4px);
+$tooltip-padding-y: o-to-rem(5px);
+$tooltip-padding-x: o-to-rem(8px);
+$tooltip-margin: o-to-rem(4px);
+$tooltip-arrow-width: 0;
+$tooltip-arrow-height: 0;
+
+$toast-border-radius: o-to-rem(8px);
+$toast-border-width: 1px;
+$toast-box-shadow: $box-shadow;
+$toast-padding-x: o-to-rem(16px);
+$toast-padding-y: o-to-rem(12px);
+$toast-spacing: o-to-rem(12px);
+
+// ---------------------------------------------------------------------------
+// Navigation - a Fluent tab is underlined by a 3px rounded accent pill
+// ---------------------------------------------------------------------------
+$nav-link-padding-y: o-to-rem(7px);
+$nav-link-padding-x: o-to-rem(12px);
+$nav-link-font-weight: 400;
+$nav-link-color: $o-gray-700;
+$nav-link-hover-color: $o-gray-900;
+$nav-tabs-border-width: 0;
+$nav-tabs-border-radius: 0;
+$nav-tabs-link-active-bg: transparent;
+$nav-tabs-link-active-border-color: transparent;
+$nav-tabs-link-hover-border-color: transparent;
+$nav-pills-border-radius: o-to-rem(4px);
+
+$breadcrumb-divider-color: $o-gray-600;
+$breadcrumb-active-color: $o-gray-900;
+$breadcrumb-font-size: o-to-rem(14px);
+
+$pagination-border-radius: o-to-rem(4px);
+$pagination-border-width: 0;
+$pagination-bg: transparent;
+$pagination-color: $o-gray-900;
+$pagination-hover-bg: rgba($o-black, .0373);
+$pagination-active-bg: $o-winui-accent;
+
+// ---------------------------------------------------------------------------
+// Data display
+// ---------------------------------------------------------------------------
+// TableView rows are 40px tall, headers 32px, and the grid draws horizontal
+// rules only - no vertical grid lines, no zebra striping.
+$table-cell-padding-y: o-to-rem(9px);
+$table-cell-padding-x: o-to-rem(12px);
+$table-cell-padding-y-sm: o-to-rem(6px);
+$table-cell-padding-x-sm: o-to-rem(8px);
+$table-th-font-weight: 600;
+$table-border-color: $o-gray-300;
+$table-group-separator-color: $o-gray-300;
+$table-striped-bg-factor: 0;
+$table-striped-bg: transparent;
+$table-hover-bg-factor: .0373;             // SubtleFillColorSecondary
+$table-active-bg-factor: .0608;
+$table-color: $o-gray-900;
+
+$progress-height: o-to-rem(4px);
+$progress-bg: $o-gray-300;
+$progress-border-radius: o-to-rem(2px);
+$progress-box-shadow: none;
+$progress-bar-bg: $o-winui-accent;
+$progress-bar-transition: width .3s cubic-bezier(0, 0, 0, 1);
+
+// InfoBadge: a 16px pill; Odoo also uses `.badge` for tags, hence the 4px radius.
+$badge-font-size: o-to-rem(12px);
+$badge-font-weight: 400;
+$badge-padding-y: o-to-rem(2px);
+$badge-padding-x: o-to-rem(8px);
+$badge-border-radius: o-to-rem(4px);
+
+$list-group-border-radius: o-to-rem(4px);
+$list-group-border-color: $o-gray-300;
+$list-group-item-padding-y: o-to-rem(8px);
+$list-group-item-padding-x: o-to-rem(12px);
+
+$accordion-border-radius: o-to-rem(4px);
+$accordion-button-active-bg: transparent;
+$accordion-button-active-color: $o-gray-900;
+$accordion-button-focus-box-shadow: none;
+$accordion-padding-y: o-to-rem(12px);
+$accordion-padding-x: o-to-rem(16px);
+
+$hr-color: $o-gray-300;
+$hr-opacity: 1;
+
+// ---------------------------------------------------------------------------
+// Links
+// ---------------------------------------------------------------------------
+$link-color: $o-winui-accent-dark-1;
+$link-hover-color: $o-winui-accent-dark-2;
+$link-decoration: none;
+$link-hover-decoration: underline;

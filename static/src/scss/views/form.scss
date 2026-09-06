@@ -1,0 +1,513 @@
+///============================================================================
+/// web_winui - Form view
+///
+/// A WinUI settings/details page is a stack of *cards* on the Mica backdrop:
+/// a page title, then grouped rows of "label on the left, control on the right"
+/// inside rounded, hairlined layers.
+///
+/// Odoo's form view already has that skeleton - sheet, groups, inner groups,
+/// notebook, statusbar - so the work here is re-skinning those parts rather
+/// than restructuring anything.
+///============================================================================
+
+.o_web_client .o_form_view {
+    color: var(--winui-text-primary);
+
+    // -- The sheet is the content layer; the background behind it is the
+    //    backdrop, so it must not paint anything of its own.
+    .o_form_sheet_bg {
+        background: transparent;
+        border: 0;
+        padding-block: 8px;
+    }
+
+    // A form rendered without a sheet is painted opaque white by Odoo, which
+    // would flatten every control on it back into its background.
+    &.o_form_nosheet,
+    .o_form_nosheet {
+        background-color: transparent;
+    }
+
+    // The sheet is the card. It is deliberately sized by its content rather
+    // than stretched: a full-height sheet paints a device-tall slab that the
+    // chatter then sits inside, and on a small screen leaves a long empty run
+    // below the last field.
+    //
+    // It keeps Odoo's own max width - narrowing it would re-flow every form
+    // built for the wider column rather than just re-skin it.
+    // No `align-self` here: `.o_form_sheet_bg` is a *column* flex container, so
+    // align-self would govern the sheet's width and shrink it to its content,
+    // pushing the totals column out of view. The sheet already hugs its content
+    // vertically; the full-height surface behind it is the content layer,
+    // handled in `layout/webclient.scss`.
+    .o_form_sheet {
+        padding: 24px;
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-overlay);
+        background-color: var(--winui-card-default);
+        box-shadow: none;
+    }
+
+    // -- Page title ---------------------------------------------------------
+    .oe_title {
+        margin-block-end: 16px;
+
+        h1, .h1 {
+            font-size: var(--winui-font-title);
+            line-height: calc(var(--winui-line-title) / var(--winui-font-title));
+            font-weight: 600;
+        }
+
+        h1 input.o_input,
+        .o_field_widget input.o_input {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            padding-inline: 8px;
+        }
+    }
+
+    // -- Groups become Fluent "settings cards" ------------------------------
+    .o_group,
+    .o_inner_group {
+        margin-block-end: 8px;
+    }
+
+    .o_inner_group {
+        display: grid;
+        row-gap: 4px;
+        column-gap: 16px;
+
+        > .o_wrap_label,
+        > tbody > tr > td.o_td_label {
+            padding-block: 6px;
+            vertical-align: middle;
+        }
+    }
+
+    .o_form_label,
+    .o_wrap_label > label {
+        color: var(--winui-text-secondary);
+        font-weight: 400;
+        font-size: var(--winui-font-body);
+    }
+
+    .o_horizontal_separator,
+    .o_group > .o_horizontal_separator {
+        margin-block: 20px 8px;
+        padding-block-end: 4px;
+        border-block-end: 1px solid var(--winui-stroke-divider);
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body-large);
+        font-weight: 600;
+        text-transform: none;
+    }
+
+    // -- The status pipeline = SelectorBar ----------------------------------
+    // Odoo clips each segment into a chevron with a `clip-path` driven by
+    // `--o-statusbar-caret-width`. Fluent has no chevron pipeline, so the caret
+    // is zeroed here - the Sass variable behind it is assigned without
+    // `!default` and cannot be pre-empted - and the clip is dropped entirely,
+    // leaving a SelectorBar of flat pills.
+    .o_form_statusbar {
+        min-block-size: 48px;
+        padding: 8px 16px;
+        border-block-end: 1px solid var(--winui-stroke-divider);
+        background: transparent;
+        gap: 8px;
+    }
+
+    .o_field_statusbar > .o_statusbar_status {
+        --o-statusbar-caret-width: 0px;
+        --o-statusbar-radius: var(--winui-radius-control);
+        --o-statusbar-border: transparent;
+        --o-statusbar-background-active: transparent;
+        --o-statusbar-border-active: transparent;
+        --o-statusbar-background-hover: var(--winui-subtle-secondary);
+
+        // The pipeline is a WinUI SelectorBar: a recessed track holding the
+        // states, with the current one raised out of it. It must NOT reuse the
+        // solid accent fill of a primary button - that is what made "Sales
+        // Order" indistinguishable from "Create Invoice" sitting beside it.
+        // This control reports a state; the buttons next to it perform one.
+        gap: 2px;
+        // Inline padding only - NEVER block padding or a border here.
+        // `StatusBarField.areItemsWrapping()` decides the pipeline has
+        // overflowed by comparing the container's height to one item's height:
+        //
+        //     return root.getBoundingClientRect().height > firstItem.height;
+        //
+        // Any vertical padding makes the container permanently taller than its
+        // items, so the check is always true and Odoo folds every state away
+        // into its overflow dropdown. For the same reason every segment below
+        // carries the same 1px transparent border, so they all measure equal.
+        padding-inline: 2px;
+        padding-block: 0;
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-alt-secondary);
+
+        > .o_arrow_button {
+            position: relative;
+            margin: 0 !important;
+            padding: 3px 12px !important;
+            min-block-size: 0;
+            border: 1px solid transparent !important;
+            border-radius: var(--winui-radius-control) !important;
+            background-color: transparent !important;
+            color: var(--winui-text-secondary) !important;
+            font-size: var(--winui-font-body);
+            font-weight: 400;
+            box-shadow: none;
+            clip-path: none !important;
+
+            // Odoo uses this pseudo-element to paint the chevron notch; the
+            // current-state pill reuses it below.
+            &::before {
+                display: none;
+            }
+
+            &:hover:not(:disabled) {
+                background-color: var(--winui-subtle-secondary) !important;
+                color: var(--winui-text-primary) !important;
+            }
+
+            &.o_arrow_button_current {
+                background-color: var(--winui-control-default) !important;
+                border-color: var(--winui-stroke-control) !important;
+                border-bottom-color: var(--winui-elev-border-bottom) !important;
+                color: var(--winui-text-primary) !important;
+                font-weight: 600;
+                box-shadow: var(--winui-shadow-card);
+
+                // The 3px accent pill a SelectorBar puts under its selection.
+                &::before {
+                    display: block;
+                    content: "";
+                    position: absolute;
+                    inset: auto 0 2px 0;
+                    inline-size: 24px;
+                    block-size: 2px;
+                    margin-inline: auto;
+                    border-radius: 1px;
+                    background-color: var(--winui-accent-fill);
+                    clip-path: none;
+                }
+            }
+
+            // Odoo renders the state you are currently in as a disabled button.
+            // It is still the state, so it keeps full contrast; only the other
+            // segments dim when they cannot be reached.
+            &:disabled:not(.o_arrow_button_current) {
+                color: var(--winui-text-disabled) !important;
+            }
+        }
+    }
+
+    // -- Stat buttons = Fluent card buttons ---------------------------------
+    // The container is `.o-form-buttonbox` in Odoo 18, not `.oe_button_box`;
+    // targeting the old name meant these were never styled and stayed plain
+    // outline buttons at whatever height their content gave them.
+    .o-form-buttonbox {
+        gap: 8px;
+        align-items: stretch;
+
+        .oe_stat_button,
+        .o_stat_button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-block-size: 44px;
+            padding: 6px 12px;
+            border: 1px solid var(--winui-stroke-card) !important;
+            border-radius: var(--winui-radius-overlay);
+            background-color: var(--winui-card-default);
+            color: var(--winui-text-primary);
+            transition: background-color var(--winui-dur-instant) linear;
+
+            &:hover { background-color: var(--winui-card-tertiary); }
+            &:active { background-color: var(--winui-control-tertiary); }
+
+            .o_button_icon,
+            > i,
+            > .fa {
+                font-size: 16px;
+                line-height: 1;
+                color: var(--winui-accent-text);
+            }
+
+            .o_stat_value,
+            .o_field_widget {
+                font-weight: 600;
+                color: var(--winui-text-primary);
+            }
+
+            .o_stat_text,
+            .o_stat_info {
+                color: var(--winui-text-secondary);
+                font-size: var(--winui-font-caption);
+                line-height: calc(var(--winui-line-caption) / var(--winui-font-caption));
+            }
+        }
+    }
+
+    // -- Chatter and attachments -------------------------------------------
+    // The chatter is a panel of its own, not part of the sheet - so it gets its
+    // own surface instead of sharing whatever is behind the form.
+    .o-mail-Form-chatter,
+    .o_FormRenderer_chatterContainer {
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-overlay);
+        background-color: var(--winui-card-default);
+    }
+
+    // `mail` gives the sticky top bar an opaque light fill of its own, which
+    // reads as a mismatched strip on the chatter card in light mode and puts
+    // white button labels on a near-white ground in dark. The card behind it
+    // is the surface; this bar carries only its divider.
+    .o-mail-Chatter-top {
+        background-color: transparent;
+        border-block-end: 1px solid var(--winui-stroke-divider);
+    }
+
+    // Without an explicit cross-axis alignment the flex children stretch, so
+    // the row mixes control heights and the followers counter sits hard
+    // against its icon.
+    .o-mail-Chatter-topbar {
+        background-color: transparent;
+        align-items: center;
+        gap: 4px;
+
+        // Pinned rather than floored, for the same reason as the command bar:
+        // left to their own padding these came out 33 / 29 / 45px in one row.
+        .btn {
+            block-size: var(--winui-control-height);
+            min-block-size: var(--winui-control-height);
+            padding-block: 0;
+            align-self: center;
+        }
+
+        .o-mail-Followers {
+            display: flex;
+            align-items: center;
+            block-size: var(--winui-control-height);
+            align-self: center;
+        }
+
+        .o-mail-Followers-counter {
+            margin-inline-start: 3px;
+        }
+    }
+
+    // -- x2many embedded lists ----------------------------------------------
+    // An embedded list is a data block, not part of the sheet's own surface.
+    // Without a fill of its own it dissolves into the sheet and the rows lose
+    // the ground they are supposed to sit on.
+    //
+    // Exactly one element may carry that fill. `.o_field_x2many_list` is the
+    // field wrapper and `.o_list_renderer` is the list inside it, and Odoo
+    // makes the renderer full-bleed by pulling it out of the sheet's padding
+    // with negative margins (`margin: -16px -24px 10px`). Painting both stacks
+    // two cards that cannot line up, since the wrapper sits on the sheet's
+    // content box while the renderer hangs outside it.
+    //
+    // Odoo's bleed is kept rather than cancelled. Order-line tables are
+    // routinely wider than the sheet's content box, so pulling the list back
+    // inside the padding only moves the overflow to the last column, where
+    // `overflow: hidden` clips it. The bleed is what buys those columns room.
+    //
+    // So: the wrapper goes flat, the renderer keeps Odoo's geometry and carries
+    // the single card, and a table too wide even for the bled-out width scrolls
+    // inside it rather than losing its right-hand columns.
+    .o_field_x2many_list {
+        border: 0;
+        background-color: transparent;
+    }
+
+    .o_field_x2many .o_list_renderer {
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-default);
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    // "Add a product / section / note" are commands, not links to records. They
+    // read as Subtle buttons with a leading "+", so a row of them can never be
+    // mistaken for the relational values in the cells above.
+    .o_field_x2many_list_row_add {
+        color: var(--winui-text-primary);
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-block-size: var(--winui-control-height-sm);
+            padding: 2px 10px;
+            border-radius: var(--winui-radius-control);
+            color: var(--winui-text-primary);
+            font-weight: 400;
+            text-decoration: none;
+            transition: background-color var(--winui-dur-instant) linear;
+
+            &::before {
+                content: "+";
+                font-size: 14px;
+                line-height: 1;
+                color: var(--winui-text-secondary);
+            }
+
+            &:hover {
+                background-color: var(--winui-subtle-secondary);
+                color: var(--winui-text-primary);
+                text-decoration: none;
+            }
+
+            &:active {
+                background-color: var(--winui-subtle-tertiary);
+            }
+        }
+    }
+
+    // -- Field-level messaging ----------------------------------------------
+    .o_field_widget .o_field_translate {
+        color: var(--winui-text-tertiary);
+    }
+
+    .o_form_uri {
+        color: var(--winui-accent-text);
+    }
+}
+
+// The container the form view lives in, so an inline form in a dialog keeps
+// the same rhythm.
+.modal .o_form_view .o_form_sheet {
+    padding: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Small screens: the button box collapses to one toggle
+// ---------------------------------------------------------------------------
+// Odoo folds the whole box into a single icon button next to the cog menu. Left
+// alone the three of them come out at 29, 32 and 33px, which is what makes the
+// command bar look ragged - so every icon-only control there is pinned to the
+// control height and squared off.
+@media (max-width: 767.98px) {
+    .o_web_client .o_control_panel {
+        .o-form-buttonbox {
+            gap: 4px;
+        }
+
+        .o-form-buttonbox .oe_stat_button,
+        .o-form-buttonbox .o_stat_button,
+        .o_cp_action_menus > .btn,
+        .o_control_panel_main_buttons .btn:has(> i:only-child) {
+            // A floor, never a fixed width: `:has(> i:only-child)` also matches
+            // a button holding an icon plus a bare text node, which would be
+            // clipped and overlap its neighbour if pinned.
+            min-inline-size: var(--winui-control-height);
+            block-size: var(--winui-control-height);
+            min-block-size: var(--winui-control-height);
+            padding: 0;
+            justify-content: center;
+            border-radius: var(--winui-radius-control);
+
+            > i,
+            > .fa,
+            > .o_button_icon {
+                font-size: 16px;
+                margin: 0;
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// The button box inside its overflow popover
+// ---------------------------------------------------------------------------
+// Collapsed button box
+// ---------------------------------------------------------------------------
+// When the stat buttons do not fit, Odoo moves the whole box into a popover.
+//
+// The popover element *is* the button box - its class list reads
+// `o_popover popover ... o-form-buttonbox p-0 border-0 o-form-buttonbox-small`
+// - so the obvious `.o_popover .o-form-buttonbox` descendant selector matches
+// nothing at all. It has to be a compound. (The descendant form is kept below
+// for any layout that really does nest one inside the other.)
+//
+// Odoo lays the flyout out as a two-column grid whose cells are
+// `.o-dropdown-item.d-flex.flex-column`. The theme's menu-item rule sets
+// `align-items: center`, which in a *column* flex container centres children
+// horizontally - leaving each stat button at its content width, adrift in the
+// middle of its cell. The cells are stretched here so the buttons fill them
+// and read as menu rows rather than cards nested in table cells.
+.o_popover.o-form-buttonbox,
+.o-dropdown--menu.o-form-buttonbox,
+.dropdown-menu.o-form-buttonbox,
+.o_popover .o-form-buttonbox,
+.o-dropdown--menu .o-form-buttonbox,
+.dropdown-menu .o-form-buttonbox {
+    // Odoo puts `p-0` on the element, and Bootstrap spacing utilities carry
+    // `!important`, so the flyout's own padding has to be forced back on.
+    padding: 4px !important;
+    gap: 2px;
+
+    // The grid cell. `stretch` is the whole fix for the floating buttons.
+    .o-dropdown-item {
+        align-items: stretch;
+        gap: 0;
+        min-block-size: 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    .oe_stat_button,
+    .o_stat_button {
+        display: flex;
+        inline-size: 100%;
+        min-inline-size: 0;
+        block-size: auto;
+        min-block-size: var(--winui-control-height);
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        margin: 0;
+        padding: 6px 12px;
+        border: 0 !important;
+        border-radius: var(--winui-radius-control);
+        background-color: transparent;
+        color: var(--winui-text-primary);
+        text-align: start;
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+        &:active { background-color: var(--winui-subtle-tertiary); }
+
+        // Odoo separates the grid cells with rules; a menu needs none.
+        &::before,
+        &::after {
+            display: none;
+        }
+
+        .o_button_icon {
+            flex: 0 0 auto;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .o_stat_info,
+        .o_field_widget {
+            align-items: flex-start;
+            text-align: start;
+        }
+    }
+}
+
+// Only the nested variant is a plain container inside a flyout that already
+// has a surface. The compound selectors above land on the popover itself, so
+// clearing its background there would strip the acrylic and let the form show
+// straight through the menu.
+.o_popover .o-form-buttonbox,
+.o-dropdown--menu .o-form-buttonbox,
+.dropdown-menu .o-form-buttonbox {
+    border: 0;
+    background: transparent;
+}

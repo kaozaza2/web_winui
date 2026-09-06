@@ -1,0 +1,371 @@
+///============================================================================
+/// web_winui - Fluent / WinUI 3 primary variables
+///
+/// Injected *before* `web/static/src/scss/primary_variables.scss` and before
+/// the `web/static/src/**/*.variables.scss` glob that follows it. Everything
+/// Odoo declares in those files uses `!default`, so assigning here (without
+/// `!default`) is what makes Odoo's own compiled stylesheets - and those of
+/// every third-party module built on the same variables - adopt the Fluent
+/// metrics instead of the Odoo ones.
+///
+/// Values are transcribed from the WinUI 3 resource dictionaries:
+///   controls/dev/CommonStyles/Common_themeresources_any.xaml   (colour ramps)
+///   controls/dev/CommonStyles/CornerRadius_themeresources.xaml (radii)
+///   controls/dev/CommonStyles/TextBlock_themeresources.xaml    (type ramp)
+///   controls/dev/CommonStyles/Button_themeresources.xaml       (metrics)
+///
+/// The Fluent ramps are defined with alpha (e.g. TextFillColorPrimary is
+/// #E4000000). Sass here uses the *composited opaque equivalent* over the light
+/// surface, because Odoo runs `darken()`, `mix()` and even `str-slice()` on
+/// several of these variables and those break on rgba() values. The genuine
+/// alpha ramps are exposed as CSS custom properties in `winui_tokens.scss`,
+/// which is what the component layer actually uses.
+///============================================================================
+
+// ---------------------------------------------------------------------------
+// Neutral ramp - Fluent "SolidBackgroundFill" / "TextFill" ladder
+// ---------------------------------------------------------------------------
+$o-white: #FFFFFF;
+$o-black: #000000;
+
+$o-gray-100: #FAFAFA;  // LayerFillColorDefault over Mica
+$o-gray-200: #F3F3F3;  // SolidBackgroundFillColorBase
+$o-gray-300: #E5E5E5;  // CardStrokeColorDefault composited
+$o-gray-400: #D1D1D1;  // ControlStrongStrokeColorDisabled composited
+$o-gray-500: #A8A8A8;
+$o-gray-600: #8D8D8D;  // TextFillColorTertiary   (#72000000 on white)
+$o-gray-700: #616161;  // TextFillColorSecondary  (#9E000000 on white)
+$o-gray-800: #3B3B3B;
+$o-gray-900: #1B1B1B;  // TextFillColorPrimary    (#E4000000 on white)
+
+$o-grays: (
+    100: $o-gray-100,
+    200: $o-gray-200,
+    300: $o-gray-300,
+    400: $o-gray-400,
+    500: $o-gray-500,
+    600: $o-gray-600,
+    700: $o-gray-700,
+    800: $o-gray-800,
+    900: $o-gray-900,
+);
+
+// ---------------------------------------------------------------------------
+// Accent - Windows default "Blue" (#0078D4) and its Fluent ramp
+// ---------------------------------------------------------------------------
+// The ramp mirrors SystemAccentColorLight1..3 / Dark1..3. The web client can
+// swap it at runtime through the `--winui-accent-*` custom properties; these
+// Sass values are the compile-time default used by Odoo's own stylesheets.
+$o-winui-accent: #0078D4;
+$o-winui-accent-light-1: #429CE3;
+$o-winui-accent-light-2: #76B9ED;
+$o-winui-accent-light-3: #A6D8FF;
+$o-winui-accent-dark-1: #005A9E;
+$o-winui-accent-dark-2: #004275;
+$o-winui-accent-dark-3: #002642;
+
+$o-community-color: $o-winui-accent;
+$o-enterprise-color: $o-winui-accent;
+$o-enterprise-action-color: $o-winui-accent-dark-1;
+
+$o-brand-odoo: $o-winui-accent;
+$o-brand-primary: $o-winui-accent;
+$o-brand-secondary: $o-gray-600;
+$o-brand-lightsecondary: $o-gray-200;
+
+$o-action: $o-winui-accent;
+
+// Fluent SystemFillColor* (light theme)
+$o-success: #0F7B0F;   // SystemFillColorSuccess
+$o-info: #0078D4;      // SystemFillColorAttention == accent
+$o-warning: #9D5D00;   // SystemFillColorCaution
+$o-danger: #C42B1C;    // SystemFillColorCritical
+
+// Contextual text colours - deliberately darker than the fills so that body
+// copy keeps a >= 4.5:1 ratio on the light layer surface.
+$o-theme-text-colors: (
+    "success": #0B6A0B,
+    "info": #005A9E,
+    "warning": #7A4700,
+    "danger": #A02418,
+);
+
+// ---------------------------------------------------------------------------
+// Typography - the WinUI type ramp
+// ---------------------------------------------------------------------------
+// Segoe UI Variable ships with Windows 11; the static Segoe UI covers Windows
+// 10, and the remaining entries keep other platforms close to the metrics.
+$o-system-fonts: (
+    "Segoe UI Variable Text",
+    "Segoe UI Variable Static Text",
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Selawik",
+    Roboto,
+    "Helvetica Neue",
+    "Noto Sans",
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji"
+);
+
+$o-winui-display-fonts: (
+    "Segoe UI Variable Display",
+    "Segoe UI Variable Static Display",
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Selawik",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif
+);
+
+$o-font-family-sans-serif: o-add-unicode-support-font($o-system-fonts);
+$o-headings-font-family: o-add-unicode-support-font($o-winui-display-fonts);
+$o-font-family-monospace: o-add-unicode-support-font((
+    "Cascadia Mono", "Cascadia Code", Consolas, "Courier New", monospace
+));
+
+// Body = 14px, Caption = 12px, Body Large = 18px (TextBlock_themeresources).
+$o-font-size-base: o-to-rem(14px);
+$o-font-size-base-touch: o-to-rem(16px);
+$o-font-size-base-small: o-to-rem(12px);
+$o-font-size-base-smaller: o-to-rem(12px);
+
+// WinUI pairs 14px body copy with a 20px line box.
+$o-line-height-base: 1.4286;   // 20 / 14
+$o-line-height-sm: 1.3333;     // 16 / 12
+$o-line-height-lg: 1.5;
+
+// Fluent uses SemiBold (600) for emphasis, never Bold (700): "BodyStrong",
+// "Subtitle" and "Title" are all SemiBold in the WinUI type ramp.
+$o-font-weight-normal: 400;
+$o-font-weight-medium: 600;
+$o-font-weight-bold: 600;
+
+// ---------------------------------------------------------------------------
+// Text colours
+// ---------------------------------------------------------------------------
+$o-main-text-color: $o-gray-900;         // TextFillColorPrimary
+$o-main-color-muted: $o-gray-700;        // TextFillColorSecondary
+$o-main-headings-color: $o-gray-900;
+$o-main-link-color: $o-winui-accent-dark-1;   // AccentTextFillColorPrimary
+$o-main-favorite-color: #EAA300;         // Fluent "Gold" accent
+$o-main-code-color: #C42B1C;
+
+$o-opacity-disabled: .3628;              // TextFillColorDisabled alpha (#5C)
+$o-opacity-muted: .6196;                 // TextFillColorSecondary alpha (#9E)
+
+$o-opacities: (
+    0: 0,
+    25: .25,
+    50: .5,
+    75: .75,
+    100: 1,
+    disabled: $o-opacity-disabled,
+    muted: $o-opacity-muted,
+);
+
+// ---------------------------------------------------------------------------
+// Surfaces
+// ---------------------------------------------------------------------------
+// The web client body is the Mica backdrop; views sit on the "layer" surface.
+$o-webclient-background-color: #F3F3F3;  // SolidBackgroundFillColorBase
+$o-view-background-color: #FFFFFF;       // LayerFillColorAlt
+$o-shadow-color: #000000;
+
+$o-component-active-color: $o-gray-900;
+$o-component-active-bg: rgba($o-winui-accent, .1);
+$o-component-active-border: $o-winui-accent;
+
+$o-form-lightsecondary: $o-gray-300;
+
+$o-list-footer-bg-color: transparent;
+$o-list-footer-font-weight: $o-font-weight-medium;
+
+$o-list-group-active-color: $o-gray-900;
+$o-list-group-active-bg: rgba($o-winui-accent, .1);
+
+// ---------------------------------------------------------------------------
+// Shape - ControlCornerRadius 4, OverlayCornerRadius 8
+// ---------------------------------------------------------------------------
+$o-border-radius: o-to-rem(4px);
+$o-border-radius-sm: o-to-rem(4px);
+$o-border-radius-lg: o-to-rem(8px);
+
+// ---------------------------------------------------------------------------
+// Metrics
+// ---------------------------------------------------------------------------
+// WinUI standard control height is 32px; ButtonPadding is 11,5,11,6.
+$o-spacer: 16px;
+$o-horizontal-padding: 16px;
+$o-form-spacing-unit: 4px;
+
+$o-input-padding-y: 3px;
+$o-input-padding-x: 8px;
+$o-input-bg: transparent;
+$o-input-border-required: $o-winui-accent;
+
+// Flyout metrics: FlyoutThemeMinWidth 96, padding 4px around a 32px item.
+$o-dropdown-hpadding: 12px;
+$o-dropdown-vpadding: 6px;
+$o-dropdown-max-height: 758px;   // FlyoutThemeMaxHeight
+
+$o-statbutton-height: 44px;
+$o-statbutton-spacing: 8px;
+
+// ContentDialogMaxWidth is 548; Odoo's dialogs carry far denser content, so the
+// large size keeps Odoo's width and only the medium one adopts the Fluent cap.
+$o-modal-lg: 980px;
+$o-modal-md: 548px;
+
+$o-statusbar-height: 40px;       // NavigationView "on left" item height + 4
+
+// NOTE: `$o-statusbar-arrow-width` cannot be set from here. Unlike almost
+// everything else in Odoo's variable files, `statusbar_field.variables.scss`
+// assigns it *without* `!default`, so a value set earlier is overwritten. The
+// same goes for `$o-search-panel-width`, `$o-search-panel-font-size`,
+// `$o-search-bar-facet-value-width` and `$o-field-translate-padding`. Odoo
+// exposes each of those through a CSS custom property at the point of use, and
+// that is where the theme overrides them - see `views/form.scss` and
+// `layout/search_panel.scss`.
+$o-label-font-size-factor: 1;    // Fluent labels are body-sized, not shrunk
+
+$o-breadcrumb-item-padding-x: o-to-rem(6px);
+$o-badge-min-width: 20px;        // InfoBadge is a 16px..20px pill
+
+$o-table-cell-padding-x-sm: o-to-rem(8px);
+$o-table-cell-padding-y-sm: o-to-rem(6px);
+
+$o-touch-btn-padding: 8px 12px;
+$o-touch-btn-with-icon-padding: 8px 10px;
+
+$o-card-body-bg-opacity: 1;
+
+// ---------------------------------------------------------------------------
+// Component variables Odoo declares in `**/*.variables.scss`
+// ---------------------------------------------------------------------------
+// -- Navbar (webclient/navbar/navbar.variables.scss)
+// A WinUI title bar is 48px tall and sits on the Mica backdrop, so the navbar
+// is *not* a coloured band any more: it is transparent chrome above the app.
+$o-navbar-height: 48px;
+$o-navbar-padding-v: 6px;
+$o-navbar-background: transparent;
+$o-navbar-border-bottom: 0;
+$o-navbar-entry-margin-h: 2px;
+$o-navbar-entry-padding-h: 12px;
+$o-navbar-entry-border-radius: o-to-rem(4px);
+$o-navbar-entry-color: $o-gray-800;
+$o-navbar-entry-color--hover: $o-gray-900;
+$o-navbar-entry-bg--hover: rgba($o-black, .0373);   // SubtleFillColorSecondary
+$o-navbar-entry-color--active: $o-gray-900;
+$o-navbar-entry-bg--active: rgba($o-black, .0235);  // SubtleFillColorTertiary
+$o-navbar-entry-font-size: o-to-rem(14px);
+$o-navbar-brand-font-size: o-to-rem(14px);
+$o-navbar-brand-color: $o-gray-900;
+$o-navbar-badge-size: 11px;
+$o-navbar-badge-padding: 4px;
+$o-navbar-badge-bg: $o-winui-accent;
+$o-navbar-badge-color: $o-white;
+$o-navbar-badge-text-shadow: none;
+
+// -- Control panel (search/control_panel/control_panel.variables.scss)
+$o-control-panel-background-color: transparent;
+$o-control-panel-border-bottom: 0;
+
+// -- Form (views/form/form.variables.scss)
+$o-sheet-vpadding: 24px;
+$o-form-view-sheet-max-width: 1534px;
+$o-form-renderer-max-width: 2600px;
+$o-form-picture-size: 96px;
+
+// -- Kanban (views/kanban/kanban.variables.scss)
+$o-kanban-background: transparent;
+$o-kanban-default-record-width: 320px;
+$o-kanban-small-record-width: 300px;
+$o-kanban-inside-vgutter: 8px;
+$o-kanban-inside-hgutter: 8px;
+$o-kanban-color-border-width: 3px;
+$o-kanban-record-margin: 6px;
+$o-kanban-group-padding: 12px;
+$o-kanban-progressbar-height: 4px;   // Fluent ProgressBar track is 1px..4px
+
+// -- UI colour list used for tags, kanban colours, calendar, ...
+// Replaced with the Windows 11 accent-colour palette so that any `o_colorlist`
+// / `o_tag` / kanban colour picker offers Fluent hues.
+$o-colors: #8D8D8D, #C42B1C, #CA5010, #EAA300, #0078D4, #8764B8, #CA5010,
+           #038387, #0063B1, #C239B3, #10893E, #744DA9;
+
+// ---------------------------------------------------------------------------
+// Bootstrap button variants, rebuilt on the Fluent button spec
+// ---------------------------------------------------------------------------
+// Odoo merges this map *over* its own defaults, so declaring the entries first
+// is enough to take priority. Every state has to be present: Odoo forwards the
+// whole map to the Bootstrap button mixin, which does not tolerate omissions.
+//
+// Fluent standard button:  rest ControlFillColorDefault, hover ...Secondary,
+// pressed ...Tertiary with the label dimmed to TextFillColorSecondary.
+// Fluent accent button:    rest accent, hover accent @ 90%, pressed @ 80%.
+$o-btns-bs-override: (
+    "primary": (
+        background: $o-winui-accent,
+        border: $o-winui-accent,
+        color: #FFFFFF,
+
+        hover-background: mix($o-winui-accent, #FFFFFF, 90%),
+        hover-border: mix($o-winui-accent, #FFFFFF, 90%),
+        hover-color: #FFFFFF,
+
+        active-background: mix($o-winui-accent, #FFFFFF, 80%),
+        active-border: mix($o-winui-accent, #FFFFFF, 80%),
+        active-color: rgba(#FFFFFF, .7),
+    ),
+    "secondary": (
+        background: #FDFDFD,
+        border: $o-gray-300,
+        color: $o-gray-900,
+
+        hover-background: #F9F9F9,
+        hover-border: $o-gray-300,
+        hover-color: $o-gray-900,
+
+        active-background: #F5F5F5,
+        active-border: $o-gray-300,
+        active-color: $o-gray-700,
+    ),
+    "light": (
+        background: transparent,
+        border: transparent,
+        color: $o-gray-900,
+
+        hover-background: rgba($o-black, .0373),
+        hover-border: transparent,
+        hover-color: $o-gray-900,
+
+        active-background: rgba($o-black, .0235),
+        active-border: transparent,
+        active-color: $o-gray-700,
+    ),
+);
+
+$o-btns-bs-outline-override: (
+    "secondary": (
+        background: transparent,
+        border: $o-gray-300,
+        color: $o-gray-900,
+
+        hover-background: rgba($o-black, .0373),
+        hover-border: $o-gray-300,
+        hover-color: $o-gray-900,
+
+        active-background: rgba($o-black, .0235),
+        active-border: $o-gray-300,
+        active-color: $o-gray-700,
+    ),
+);

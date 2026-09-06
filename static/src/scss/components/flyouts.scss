@@ -1,0 +1,179 @@
+///============================================================================
+/// web_winui - MenuFlyout, Flyout and Popover
+///
+/// A Fluent flyout is an acrylic card: OverlayCornerRadius (8px), a 1px
+/// SurfaceStrokeColorFlyout hairline, the 32px-depth ThemeShadow, and 4px of
+/// padding around 32px-tall items that each carry their own 4px radius.
+/// Selection is an accent fill, never a tick in the gutter.
+///
+/// Odoo's own dropdowns come in two flavours - Bootstrap's `.dropdown-menu` and
+/// OWL's `.o-dropdown--menu` - and both are covered here so that any module's
+/// menu inherits the flyout look.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+body {
+
+    .dropdown-menu,
+    .o-dropdown--menu,
+    .o_popover,
+    .popover {
+        @include winui-acrylic;
+        padding: 4px;
+        min-inline-size: 96px;
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-overlay);
+        box-shadow: var(--winui-shadow-flyout);
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body);
+    }
+
+    // -- MenuFlyoutItem -----------------------------------------------------
+    .dropdown-item,
+    .o-dropdown-item,
+    .o-navigable {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-block-size: var(--winui-control-height);
+        padding: 6px 12px;
+        border-radius: var(--winui-radius-control);
+        color: var(--winui-text-primary);
+        background-color: transparent;
+        white-space: nowrap;
+        transition: background-color var(--winui-dur-instant) linear,
+                    color var(--winui-dur-instant) linear;
+
+        &:hover,
+        &.focus,
+        &:focus {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+
+        &:active {
+            background-color: var(--winui-subtle-tertiary);
+            color: var(--winui-text-secondary);
+        }
+
+        &.selected,
+        &.active,
+        &[aria-checked="true"],
+        &[aria-selected="true"] {
+            // MenuFlyoutItem selection: an accent fill with a 3px accent pill
+            // hugging the leading edge, exactly like a NavigationViewItem.
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                inset-inline-start: 0;
+                inset-block: 6px;
+                inline-size: 3px;
+                border-radius: 2px;
+                background-color: var(--winui-accent-fill);
+            }
+        }
+
+        &.disabled,
+        &:disabled {
+            color: var(--winui-text-disabled);
+            background-color: transparent;
+            pointer-events: none;
+        }
+
+        > i,
+        > .fa,
+        > .oi {
+            inline-size: 16px;
+            font-size: 16px;
+            text-align: center;
+            color: var(--winui-text-secondary);
+        }
+    }
+
+    // -- Separator and header -----------------------------------------------
+    .dropdown-divider,
+    .o-dropdown--menu hr {
+        margin: 4px 8px;
+        border-block-start: 1px solid var(--winui-stroke-divider);
+        opacity: 1;
+    }
+
+    .dropdown-header,
+    .dropdown-menu_group {
+        padding: 8px 12px 4px;
+        font-size: var(--winui-font-caption);
+        font-weight: 600;
+        color: var(--winui-text-secondary);
+        text-transform: none;
+    }
+
+    // A cascading submenu keeps the same chrome, offset by 4px.
+    .o-dropdown--menu .o-dropdown--menu {
+        margin-inline-start: 4px;
+    }
+
+    // -- Popover ------------------------------------------------------------
+    .o_popover,
+    .popover {
+        padding: 0;
+
+        .popover-header {
+            padding: 12px 16px 4px;
+            border: 0;
+            background-color: transparent;
+            font-size: var(--winui-font-body);
+            font-weight: 600;
+            color: var(--winui-text-primary);
+        }
+
+        .popover-body {
+            padding: 12px 16px;
+            color: var(--winui-text-primary);
+        }
+
+        // Fluent flyouts do not have a beak.
+        .popover-arrow,
+        &::before,
+        &::after {
+            display: none;
+        }
+    }
+
+    // -- Autocomplete ------------------------------------------------------
+    // AutoSuggestBox drops a flyout whose items are 32px tall and whose
+    // matched substring is emphasised rather than highlighted.
+    .o-autocomplete--dropdown-menu,
+    .o_searchview_autocomplete,
+    .ui-autocomplete {
+        @include winui-acrylic;
+        padding: 4px;
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-overlay);
+        box-shadow: var(--winui-shadow-flyout);
+
+        li > a,
+        .o-autocomplete--dropdown-item > a,
+        .dropdown-item {
+            min-block-size: var(--winui-control-height);
+            padding: 6px 12px;
+            border-radius: var(--winui-radius-control);
+        }
+
+        .o-autocomplete--dropdown-item.ui-state-active > a,
+        li.ui-state-active > a {
+            background-color: var(--winui-subtle-secondary);
+            color: var(--winui-text-primary);
+        }
+    }
+}
+
+// The backdrop Odoo puts behind mobile dropdowns.
+.o_web_client .o-dropdown--menu-backdrop {
+    background-color: var(--winui-smoke);
+}

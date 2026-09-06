@@ -1,0 +1,116 @@
+///============================================================================
+/// web_winui - Fluent motion
+///
+/// WinUI motion is short and mostly linear-out: pointer feedback lands in 1/12s
+/// (83ms), control state changes in 167ms, and surfaces enter with a 250-333ms
+/// decelerate curve combined with a small upward translation. Nothing bounces
+/// and nothing scales up on entry.
+///============================================================================
+
+@keyframes winui-flyout-in {
+    from { opacity: 0; transform: translateY(-8px) scaleY(.96); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes winui-flyout-in-up {
+    from { opacity: 0; transform: translateY(8px) scaleY(.96); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes winui-dialog-in {
+    from { opacity: 0; transform: scale(1.05); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes winui-page-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes winui-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+// The 3px accent pill that slides under the selected tab / nav item.
+@keyframes winui-indicator-in {
+    from { transform: scaleX(0); opacity: 0; }
+    to   { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes winui-indicator-in-vertical {
+    from { transform: scaleY(0); opacity: 0; }
+    to   { transform: scaleY(1); opacity: 1; }
+}
+
+// ProgressRing / indeterminate ProgressBar.
+@keyframes winui-progress-indeterminate {
+    0%   { transform: translateX(-100%) scaleX(.4); }
+    50%  { transform: translateX(20%) scaleX(.6); }
+    100% { transform: translateX(160%) scaleX(.4); }
+}
+
+@keyframes winui-spin {
+    to { transform: rotate(360deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Application
+// ---------------------------------------------------------------------------
+.o_web_client {
+    // Entering a record, switching view or drilling into a breadcrumb is
+    // WinUI's "page refresh" animation: a short upward slide plus a fade.
+    .o_action_manager > .o_action > .o_view_controller,
+    .o_action_manager > .o_action.o_legacy_action {
+        animation: winui-page-in var(--winui-dur-slow) var(--winui-ease-decelerate) both;
+    }
+
+    .dropdown-menu.show,
+    .o_popover.show,
+    .o-dropdown--menu {
+        animation: winui-flyout-in var(--winui-dur-fast) var(--winui-ease-decelerate) both;
+        transform-origin: top center;
+    }
+
+    .dropdown-menu[data-popper-placement^="top"],
+    .o-dropdown--menu[data-popper-placement^="top"] {
+        animation-name: winui-flyout-in-up;
+        transform-origin: bottom center;
+    }
+}
+
+.modal.show .modal-dialog {
+    animation: winui-dialog-in var(--winui-dur-normal) var(--winui-ease-decelerate) both;
+}
+
+.modal-backdrop.show {
+    animation: winui-fade-in var(--winui-dur-fast) linear both;
+}
+
+.o_notification {
+    animation: winui-flyout-in-up var(--winui-dur-normal) var(--winui-ease-decelerate) both;
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion
+// ---------------------------------------------------------------------------
+// Honoured both from the OS setting and from the per-user "WinUI Animations"
+// preference, which the theme service maps onto `data-winui-motion`.
+@mixin winui-motion-off {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        transition-delay: 0ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+:root[data-winui-motion="off"] { @include winui-motion-off; }
+
+@media (prefers-reduced-motion: reduce) {
+    :root { @include winui-motion-off; }
+}

@@ -1,0 +1,341 @@
+///============================================================================
+/// web_winui - Compatibility sweep for the shared Odoo class vocabulary
+///
+/// Odoo addons - core and third-party alike - build their UI out of a small set
+/// of shared classes rather than their own CSS. Mapping that vocabulary onto
+/// Fluent tokens here is what makes a module the theme has never seen render
+/// natively: nothing in this file targets a specific addon.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover,
+.dropdown-menu {
+
+    // -- Field widgets ------------------------------------------------------
+    .o_field_widget {
+        color: var(--winui-text-primary);
+
+        // Widgets that render their own coloured chip.
+        .o_field_badge,
+        .o_status {
+            border-radius: var(--winui-radius-control);
+        }
+
+        // Progress-bar widget.
+        .o_progressbar_value { color: var(--winui-text-primary); }
+
+        // Percent-pie / gauge widgets keep their geometry, only the ring colour
+        // moves to the accent.
+        .o_pie_text { fill: var(--winui-text-primary); }
+    }
+
+    // The three-state "status" dot used by kanban and list decorations.
+    .o_status {
+        inline-size: 10px;
+        block-size: 10px;
+        border-radius: 50%;
+        background-color: var(--winui-fill-solid-neutral);
+
+        &.o_status_green  { background-color: var(--winui-fill-success); }
+        &.o_status_red    { background-color: var(--winui-fill-critical); }
+        &.o_status_bubble { background-color: var(--winui-accent-fill); }
+    }
+
+    // -- Colour list (kanban, tags, calendar legends) -----------------------
+    .o_colorlist,
+    .o_colorlist_item_color_transparent {
+        border-radius: var(--winui-radius-control);
+    }
+
+    .o_colorlist button {
+        inline-size: 20px;
+        block-size: 20px;
+        border-radius: var(--winui-radius-control);
+        border: 1px solid var(--winui-stroke-control-secondary);
+    }
+
+    // -- Cog / action menus -------------------------------------------------
+    .o_cp_action_menus .dropdown-toggle,
+    .o_cog_menu .dropdown-toggle {
+        inline-size: var(--winui-control-height);
+        min-inline-size: var(--winui-control-height);
+        padding-inline: 0;
+        justify-content: center;
+
+        &::after { display: none; }
+    }
+
+    // -- Debug menu ---------------------------------------------------------
+    .o_debug_manager .dropdown-toggle {
+        color: var(--winui-fill-caution);
+    }
+
+    // -- Attachments and file cards -----------------------------------------
+    .o_attachment,
+    .o-mail-AttachmentCard,
+    .o_attachment_view {
+        border: 1px solid var(--winui-stroke-card);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-card-default);
+        color: var(--winui-text-primary);
+
+        &:hover { background-color: var(--winui-card-tertiary); }
+    }
+
+    // -- Chatter (mail) -----------------------------------------------------
+    // The chatter is the single most reused Odoo surface after the form view.
+    .o-mail-Chatter,
+    .o-mail-Thread,
+    .o-mail-Composer {
+        background-color: transparent;
+        color: var(--winui-text-primary);
+    }
+
+    .o-mail-Message {
+        border-radius: var(--winui-radius-control);
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+        }
+    }
+
+    .o-mail-Message-bubble,
+    .o-mail-Composer-input {
+        border-radius: var(--winui-radius-overlay);
+    }
+
+    .o-mail-Composer-input,
+    .o-mail-Composer textarea {
+        border: 1px solid var(--winui-stroke-control);
+        border-bottom-color: var(--winui-stroke-control-strong);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-default);
+
+        &:focus {
+            background-color: var(--winui-control-input-active);
+            box-shadow: inset 0 -2px 0 0 var(--winui-accent-fill);
+        }
+    }
+
+    .o-mail-DiscussSidebar,
+    .o-mail-DiscussSidebarChannel {
+        background-color: transparent;
+        color: var(--winui-text-primary);
+    }
+
+    .o-mail-DiscussSidebarChannel {
+        min-block-size: var(--winui-nav-item-height);
+        margin-inline: 4px;
+        border-radius: var(--winui-radius-control);
+
+        &:hover { background-color: var(--winui-subtle-secondary); }
+
+        &.o-active {
+            position: relative;
+            background-color: var(--winui-subtle-secondary);
+
+            &::before {
+                content: "";
+                position: absolute;
+                inset-inline-start: 0;
+                inset-block: 6px;
+                inline-size: 3px;
+                border-radius: 2px;
+                background-color: var(--winui-accent-fill);
+            }
+        }
+    }
+
+    // -- Odoo's own "sheet"-like wrappers used across addons ----------------
+    .o_form_sheet_bg,
+    .o_setting_container,
+    .o_web_settings_dashboard,
+    .o_report_layout_preview {
+        background-color: transparent;
+    }
+
+    // -- Any addon painting with the Odoo brand colour ----------------------
+    .bg-brand-primary,
+    .o_brand_primary {
+        background-color: var(--winui-accent-fill) !important;
+        color: var(--winui-on-accent-primary) !important;
+    }
+
+    // -- Legacy jQuery-UI widgets some addons still use ---------------------
+    .ui-widget-content,
+    .ui-menu {
+        border: 1px solid var(--winui-stroke-flyout);
+        border-radius: var(--winui-radius-overlay);
+        background-color: var(--winui-acrylic-fallback);
+        box-shadow: var(--winui-shadow-flyout);
+        color: var(--winui-text-primary);
+    }
+
+    .ui-state-active,
+    .ui-menu-item:hover {
+        background-color: var(--winui-subtle-secondary);
+        border-color: transparent;
+        color: var(--winui-text-primary);
+    }
+
+    // -- Baked-in link colour -----------------------------------------------
+    // Odoo compiles `$o-main-link-color` into literals (`#005A9E` here). The
+    // theme switches through custom properties, so those literals cannot flip
+    // and a dark form ends up with 1.4:1 link text. Pointing them back at the
+    // token fixes both themes at once rather than patching the dark sweep.
+    .o_form_view .o_form_uri,
+    .o_form_view .o_form_uri > span:first-child,
+    .ui-widget.ui-autocomplete .ui-menu-item.o_m2o_dropdown_option > a,
+    .o_calendar_renderer .o_calendar_widget .fc-daygrid-day-bottom .fc-more-link {
+        color: var(--winui-accent-text);
+    }
+
+    .btn-link.btn-info:hover,
+    .btn-link.btn-info:focus,
+    .btn-link.text-info:hover,
+    .btn-link.text-info:focus {
+        color: var(--winui-accent-text) !important;
+    }
+
+    // -- Baked-in body text colour ------------------------------------------
+    // Same problem as the link colour above: `$o-main-text-color` is compiled
+    // into `#1B1B1B` literals, which stay near-black when the theme flips. The
+    // address lines under a many2one link fall to 1.22:1 in dark.
+    .o_form_view .o_form_uri > span,
+    .o_form_view .o_form_uri > span:hover,
+    .o_form_view .o_form_uri > span:focus,
+    .o_form_view .o_field_widget .o_list_renderer > tfoot > tr > td,
+    .o_kanban_dashboard .o_kanban_renderer .o_legacy_kanban_record .o_kanban_card_header {
+        color: var(--winui-text-primary);
+    }
+
+    // These carry `!important` on Odoo's side.
+    .o_field_properties .o_input,
+    .o_field_properties .o_dropdown_button,
+    .o_field_properties .o_input_dropdown {
+        color: var(--winui-text-primary) !important;
+    }
+
+    // -- Odoo's own transitions ---------------------------------------------
+    .transition-base {
+        transition-duration: var(--winui-dur-fast);
+        transition-timing-function: var(--winui-ease-point);
+    }
+
+    // -- Anything Odoo renders as a "well" ----------------------------------
+    .o_well,
+    .o_gray_box,
+    .bg-100.rounded,
+    .o_boxed {
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-alt-secondary);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Odoo's own overrides that must be undone
+// ---------------------------------------------------------------------------
+// `web/static/src/webclient/webclient.scss` draws a FontAwesome tick 1.5em to
+// the left of an active dropdown item and forces `.badge { color: black }`.
+// Both predate the theme and both need a Fluent replacement rather than a fight.
+.o_web_client,
+.modal,
+body {
+    // WinUI marks a selected MenuFlyoutItem with a backplate and a 3px accent
+    // pill, not with a tick in a gutter - a tick is only for a *toggle* item.
+    // Odoo's tick is absolutely positioned where the item's own glyph already
+    // sits, so the pill replaces it outright. The selector has to carry at
+    // least the weight of the Odoo rule it answers.
+    :not(.dropstart) > .dropdown-item.active:not(.dropdown-item_active_noarrow)::before,
+    :not(.dropstart) > .dropdown-item.selected:not(.dropdown-item_active_noarrow)::before {
+        content: "";
+        inset-block: 6px;
+        inset-block-start: 6px;
+        inset-inline-start: 0;
+        inline-size: 3px;
+        block-size: auto;
+        transform: none;
+        border-radius: 2px;
+        background-color: var(--winui-accent-fill);
+        font: inherit;
+    }
+
+    .badge {
+        color: inherit;
+        font-weight: 400;
+        border: 0;
+        outline: 0;
+
+        &.text-bg-default,
+        &.bg-light,
+        &.text-bg-light,
+        &.bg-default,
+        &.text-primary {
+            outline: 1px solid var(--winui-stroke-control-secondary);
+            outline-offset: -1px;
+        }
+    }
+
+    // Odoo gives contextual alerts a 3px leading border; the InfoBar stripe in
+    // `components/infobars.scss` replaces it.
+    .alert.alert-info,
+    .alert.alert-success,
+    .alert.alert-warning,
+    .alert.alert-danger {
+        border-width: 1px;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Bootstrap's `--body-bg`
+// ---------------------------------------------------------------------------
+// Odoo compiles Bootstrap's body background hook from `$body-bg` and it lands
+// in the bundle exactly once, as the literal `#F3F3F3`. Twenty-one rules read
+// it - the model-field-selector's page and rows, `.o_select_menu_sticky`, the
+// jQuery-UI autocomplete, `.img-thumbnail`, and the `--dropdown-*`/
+// `--accordion-*`/`--offcanvas-*` component variables - so in dark mode every
+// one of them painted a light surface that the theme could not reach.
+//
+// The most visible case was "Add Custom Filter": its field list rendered as a
+// white sheet under white body text.
+//
+// Filling the hook fixes all of them at once. It is defined on `:root` so it
+// reaches overlays portalled outside the web client, and it resolves to the
+// same colour this theme already paints `body` with, so the body itself is
+// unchanged.
+:root {
+    --body-bg: var(--winui-solid-base);
+
+    // Bootstrap resolves every bare `<a>` through
+    // `color: rgba(var(--link-color-rgb), var(--link-opacity, 1))`, which Odoo
+    // compiles from `$link-color` - the literal `#005A9E`, a colour picked for
+    // a white page and barely legible on the dark ground.
+    //
+    // The link rule in `base/typography.scss` cannot cover this: it skips
+    // `[role="button"]`, because Odoo renders commands such as "New Rule" and
+    // "Add a line" as anchors and colouring those like record links makes the
+    // two indistinguishable. Filling the hook keeps those commands legible
+    // without giving them the record-link treatment.
+    --link-color-rgb: var(--winui-accent-fill-rgb);
+    --link-color: var(--winui-accent-text);
+    --link-hover-color-rgb: var(--winui-accent-fill-rgb);
+    --link-hover-color: var(--winui-accent-text);
+}
+
+// ---------------------------------------------------------------------------
+// Model field selector
+// ---------------------------------------------------------------------------
+// The selected field is drawn as a chip with two hard literals -
+// `background: #F3F3F3` and `border: 1px solid #dadada` - chosen for a white
+// dialog, and illegible under the theme's light body text.
+//
+// Odoo's selector is three classes deep and uses the child combinator; this
+// repeats it with `.o_web_client` in front so it wins at (0,4,0).
+.o_web_client .o_model_field_selector > .o_model_field_selector_value > .o_model_field_selector_chain_part {
+    border-color: var(--winui-stroke-control);
+    border-radius: var(--winui-radius-control);
+    background-color: var(--winui-control-secondary);
+    color: var(--winui-text-primary);
+}

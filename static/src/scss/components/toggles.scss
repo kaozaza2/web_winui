@@ -1,0 +1,253 @@
+///============================================================================
+/// web_winui - CheckBox, RadioButton and ToggleSwitch
+///
+/// CheckBox     20x20, ControlCornerRadius, 1px ControlStrongStrokeColorDefault
+///              over ControlAltFillColorSecondary; checked it becomes the accent
+///              fill with a white "CheckMark" glyph.
+/// RadioButton  20px ring; checking it collapses the ring into a 10px accent
+///              disc with a 6px hole, and the hole shrinks to 4px while pressed.
+/// ToggleSwitch 40x20 pill with a 12px knob at a 4px inset; the knob grows to
+///              14x12 while pressed and slides across in 167ms.
+///
+/// Odoo renders all three through `web.CheckBox` (`.o-checkbox`,
+/// `.form-check-input`), so the rules below reach every module.
+///============================================================================
+
+.o_web_client,
+.modal,
+.o_dialog_container,
+.o_popover,
+.dropdown-menu {
+
+    // -- CheckBox -----------------------------------------------------------
+    .form-check-input[type="checkbox"] {
+        inline-size: 20px;
+        block-size: 20px;
+        margin-block-start: 0;
+        border: 1px solid var(--winui-stroke-control-strong);
+        border-radius: var(--winui-radius-control);
+        background-color: var(--winui-control-alt-secondary);
+        background-image: none;
+        box-shadow: none;
+        transition:
+            background-color var(--winui-dur-instant) linear,
+            border-color var(--winui-dur-instant) linear;
+
+        &:hover {
+            background-color: var(--winui-control-alt-tertiary);
+        }
+
+        &:active {
+            background-color: var(--winui-control-alt-quarternary);
+            border-color: var(--winui-stroke-control-strong-disabled);
+        }
+
+        &:checked,
+        &:indeterminate {
+            background-color: var(--winui-accent-fill);
+            border-color: var(--winui-accent-fill);
+            // Segoe Fluent Icons "CheckMark" (E73E) traced as a path.
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='m3.5 8.5 3 3 6-7'/%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        &:checked:hover,
+        &:indeterminate:hover {
+            background-color: rgba(var(--winui-accent-fill-rgb), .9);
+            border-color: transparent;
+        }
+
+        &:checked:active {
+            background-color: rgba(var(--winui-accent-fill-rgb), .8);
+        }
+
+        &:indeterminate {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='4' y='7' width='8' height='2' rx='1' fill='%23fff'/%3E%3C/svg%3E");
+        }
+
+        &:disabled {
+            background-color: var(--winui-control-alt-secondary);
+            border-color: var(--winui-stroke-control-strong-disabled);
+            opacity: 1;
+
+            &:checked {
+                background-color: var(--winui-control-strong-disabled);
+                border-color: transparent;
+            }
+        }
+    }
+
+    // -- RadioButton --------------------------------------------------------
+    .form-check-input[type="radio"] {
+        inline-size: 20px;
+        block-size: 20px;
+        margin-block-start: 0;
+        border: 1px solid var(--winui-stroke-control-strong);
+        border-radius: 50%;
+        background-color: var(--winui-control-alt-secondary);
+        background-image: none;
+        box-shadow: none;
+        transition:
+            background-color var(--winui-dur-instant) linear,
+            border-color var(--winui-dur-instant) linear,
+            box-shadow var(--winui-dur-fast) var(--winui-ease-point);
+
+        &:hover { background-color: var(--winui-control-alt-tertiary); }
+        &:active { background-color: var(--winui-control-alt-quarternary); }
+
+        &:checked {
+            // 10px accent disc with a 6px hole, drawn with a single inset ring
+            // so the dot can animate its size without a pseudo-element.
+            background-color: var(--winui-accent-fill);
+            border-color: var(--winui-accent-fill);
+            background-image: none;
+            box-shadow: inset 0 0 0 4px var(--winui-control-solid);
+        }
+
+        &:checked:hover { box-shadow: inset 0 0 0 3px var(--winui-control-solid); }
+        &:checked:active { box-shadow: inset 0 0 0 5px var(--winui-control-solid); }
+
+        &:disabled {
+            border-color: var(--winui-stroke-control-strong-disabled);
+
+            &:checked {
+                background-color: var(--winui-control-strong-disabled);
+                border-color: transparent;
+            }
+        }
+    }
+
+    .form-check-label {
+        padding-inline-start: 4px;
+        color: var(--winui-text-primary);
+        font-size: var(--winui-font-body);
+    }
+
+    // -- ToggleSwitch -------------------------------------------------------
+    .form-switch .form-check-input,
+    .o_boolean_toggle .form-check-input {
+        inline-size: 40px;
+        block-size: 20px;
+        border-radius: 10px;
+        border: 1px solid var(--winui-stroke-control-strong);
+        background-color: var(--winui-control-alt-secondary);
+        background-repeat: no-repeat;
+        background-position: 3px center;
+        background-size: 12px 12px;
+        // The knob: a 12px ControlStrongFillColorDefault disc.
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23616161'/%3E%3C/svg%3E");
+        box-shadow: none;
+        transition:
+            background-color var(--winui-dur-fast) var(--winui-ease-point),
+            background-position var(--winui-dur-fast) var(--winui-ease-point),
+            border-color var(--winui-dur-fast) var(--winui-ease-point);
+
+        &:hover { background-color: var(--winui-control-alt-tertiary); }
+        &:active { background-color: var(--winui-control-alt-quarternary); }
+
+        &:checked {
+            background-color: var(--winui-accent-fill);
+            border-color: var(--winui-accent-fill);
+            background-position: 23px center;
+            // Knob turns TextOnAccentFillColorPrimary once the track is accent.
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23ffffff'/%3E%3C/svg%3E");
+        }
+
+        &:checked:hover { background-color: rgba(var(--winui-accent-fill-rgb), .9); }
+        &:checked:active { background-color: rgba(var(--winui-accent-fill-rgb), .8); }
+
+        &:disabled {
+            border-color: var(--winui-stroke-control-strong-disabled);
+            opacity: 1;
+
+            &:checked {
+                background-color: var(--winui-control-strong-disabled);
+                border-color: transparent;
+            }
+        }
+    }
+
+    // -- Odoo's checkbox wrapper --------------------------------------------
+    .o-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-block-size: 20px;
+        padding-inline-start: 0;
+        margin-block-end: 0;
+
+        // Bootstrap lays `.form-check` out by floating the input and pulling
+        // it back by the padding it added; the flex row here needs neither, and
+        // leaving the negative margin in place drags the box over the control
+        // to its left.
+        .form-check-input {
+            float: none;
+            margin-inline: 0;
+            margin-block: 0;
+            flex: 0 0 auto;
+        }
+
+        .form-check-label {
+            margin-block-end: 0;
+        }
+    }
+
+    // -- Priority stars and favourites --------------------------------------
+    // Fluent RatingControl: a filled star in the accent "gold" and a hollow one
+    // otherwise, both at 16px.
+    .o_priority .o_priority_star,
+    .o_field_boolean_favorite .fa {
+        font-size: 16px;
+        color: var(--winui-text-tertiary);
+        transition: color var(--winui-dur-instant) linear, transform var(--winui-dur-instant) var(--winui-ease-point);
+
+        &.fa-star,
+        &.o_priority_star.fa-star {
+            color: #EAA300;
+        }
+
+        &:hover {
+            color: #EAA300;
+            transform: scale(1.15);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Dark theme: the switch knob and the radio hole are baked into data URIs, so
+// they cannot follow a custom property and need an explicit swap.
+// ---------------------------------------------------------------------------
+@mixin winui-toggles-dark {
+    .form-switch .form-check-input:not(:checked),
+    .o_boolean_toggle .form-check-input:not(:checked) {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23d0d0d0'/%3E%3C/svg%3E");
+    }
+
+    .form-check-input[type="radio"]:checked {
+        box-shadow: inset 0 0 0 4px #{rgba(#000000, .95)};
+    }
+
+    .form-check-input[type="radio"]:checked:hover { box-shadow: inset 0 0 0 3px #{rgba(#000000, .95)}; }
+    .form-check-input[type="radio"]:checked:active { box-shadow: inset 0 0 0 5px #{rgba(#000000, .95)}; }
+
+    .form-select,
+    select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23cccccc' stroke-width='1.2' d='M2 4.5 6 8.5l4-4'/%3E%3C/svg%3E");
+    }
+}
+
+:root[data-winui-theme="dark"] {
+    .o_web_client, .modal, .o_dialog_container, .o_popover, .dropdown-menu {
+        @include winui-toggles-dark;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) {
+        .o_web_client, .modal, .o_dialog_container, .o_popover, .dropdown-menu {
+            @include winui-toggles-dark;
+        }
+    }
+}

@@ -1,0 +1,207 @@
+///============================================================================
+/// web_winui - Fluent materials: Mica, Mica Alt, Acrylic and Layer
+///
+/// WinUI composes a window out of three stacked things:
+///   1. a *backdrop material* (Mica or Acrylic) that fills the whole window,
+///   2. one or more *layers* - rounded, faintly translucent panes that hold the
+///      content and are separated from the backdrop by a 1px card stroke,
+///   3. the *controls* themselves, painted with the control fill ramp.
+///
+/// Mica samples the desktop wallpaper, blurs it heavily and desaturates it. A
+/// web page has no wallpaper to sample, so it is approximated the way the WinUI
+/// docs describe the effect: the solid base colour with a very low-strength
+/// accent tint and a trace of noise. Acrylic is a real backdrop blur and is
+/// reproduced faithfully with `backdrop-filter`.
+///============================================================================
+
+// A 128x128 tile of monochrome noise. WinUI adds this to every material to stop
+// large flat areas from banding.
+$winui-noise-uri: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E";
+
+@mixin winui-noise-overlay($-z: 0) {
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: $-z;
+        pointer-events: none;
+        background-image: url("#{$winui-noise-uri}");
+        background-size: 128px 128px;
+        opacity: var(--winui-noise-opacity);
+        mix-blend-mode: overlay;
+    }
+}
+
+/// Mica - the window backdrop.
+@mixin winui-mica($-base: var(--winui-mica-base)) {
+    position: relative;
+    background-color: $-base;
+    background-image:
+        radial-gradient(
+            140% 120% at 15% -10%,
+            rgba(var(--winui-accent-fill-rgb), calc(0.10 * var(--winui-mica-tint-opacity))) 0%,
+            rgba(var(--winui-accent-fill-rgb), 0) 60%
+        ),
+        radial-gradient(
+            120% 120% at 100% 0%,
+            rgba(var(--winui-accent-fill-rgb), calc(0.06 * var(--winui-mica-tint-opacity))) 0%,
+            rgba(var(--winui-accent-fill-rgb), 0) 55%
+        );
+    background-attachment: fixed;
+}
+
+/// Acrylic - an in-app translucent surface. Falls back to the solid tint when
+/// the browser has no `backdrop-filter` or transparency is switched off.
+///
+/// `$-tint` selects the strength: the default suits flyouts and toasts, while
+/// larger sheets such as the app drawer take `--winui-acrylic-tint-strong`.
+@mixin winui-acrylic($-tint: var(--winui-acrylic-tint)) {
+    background-color: var(--winui-acrylic-fallback);
+
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+        background-color: #{$-tint};
+        -webkit-backdrop-filter: blur(var(--winui-acrylic-blur)) saturate(var(--winui-acrylic-saturation));
+        backdrop-filter: blur(var(--winui-acrylic-blur)) saturate(var(--winui-acrylic-saturation));
+    }
+}
+
+/// Layer - the rounded content pane that sits on the backdrop.
+@mixin winui-layer($-radius: var(--winui-radius-overlay)) {
+    background-color: var(--winui-layer-alt);
+    border: 1px solid var(--winui-stroke-card);
+    border-radius: $-radius;
+}
+
+/// The Fluent control stroke: a 1px border whose leading edge is stronger.
+/// In the light theme the stronger edge is the bottom one, in the dark theme
+/// the top one - WinUI flips the gradient with a ScaleTransform.
+@mixin winui-control-stroke {
+    border: 1px solid var(--winui-stroke-control);
+    border-bottom-color: var(--winui-elev-border-bottom, var(--winui-stroke-control));
+    border-top-color: var(--winui-elev-border-top, var(--winui-stroke-control));
+}
+
+// The two edge tokens cannot be selected with a CSS variable in a property
+// name, so they are resolved per theme here instead.
+:root {
+    --winui-elev-border-bottom: var(--winui-stroke-control-secondary);
+    --winui-elev-border-top: var(--winui-stroke-control);
+}
+
+:root[data-winui-theme="dark"] {
+    --winui-elev-border-bottom: var(--winui-stroke-control);
+    --winui-elev-border-top: var(--winui-stroke-control-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) {
+        --winui-elev-border-bottom: var(--winui-stroke-control);
+        --winui-elev-border-top: var(--winui-stroke-control-secondary);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Application to the shell
+// ---------------------------------------------------------------------------
+html, body {
+    background-color: var(--winui-solid-base);
+}
+
+// In Odoo 18 the web client is mounted on <body> itself, so `.o_web_client`
+// *is* the body element and its direct children are the navbar, the action
+// manager, the overlay container - and every portalled overlay, including
+// `.modal-backdrop` and the mobile app drawer.
+//
+// That is why the noise tile is pushed behind the content with a negative
+// z-index instead of lifting the children above it: a `> *` rule here would
+// rewrite `position` and `z-index` on the whole overlay layer. Bootstrap's
+// `.modal-backdrop` carries no `!important`, so it would lose its
+// `position: fixed`, drop into normal flow, push the page down and paint over
+// the drawer it is supposed to sit behind.
+.o_web_client {
+    @include winui-mica;
+    @include winui-noise-overlay(-1);
+
+    &::after {
+        // Fixed so the grain stays put while the content scrolls, and behind
+        // everything so it never intercepts a pointer or covers the chrome.
+        position: fixed;
+    }
+}
+
+// Mica Alt is the darker variant used behind tabbed shells; it makes the
+// content layer read as a card floating on a recessed base.
+:root[data-winui-material="mica_alt"] .o_web_client {
+    @include winui-mica(var(--winui-mica-alt-base));
+}
+
+// Choosing Acrylic as the window material turns the whole backdrop translucent;
+// in a browser there is nothing behind the page to sample, so it renders as the
+// solid base. It deliberately does *not* use `--winui-acrylic-fallback`, which
+// is lighter than the content layer and would invert the surface ladder.
+:root[data-winui-material="acrylic"] .o_web_client {
+    background-color: var(--winui-solid-base);
+    background-image: none;
+}
+
+:root[data-winui-material="solid"] .o_web_client {
+    background-color: var(--winui-solid-base);
+    background-image: none;
+
+    &::after {
+        display: none;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Reusable classes, for templates written against the theme
+// ---------------------------------------------------------------------------
+.winui-mica { @include winui-mica; }
+.winui-acrylic { @include winui-acrylic; }
+.winui-layer { @include winui-layer; }
+.winui-control-stroke { @include winui-control-stroke; }
+
+.winui-card {
+    @include winui-layer(var(--winui-radius-overlay));
+    padding: var(--winui-content-padding);
+    box-shadow: var(--winui-shadow-card);
+}
+
+// ---------------------------------------------------------------------------
+// Reveal highlight
+// ---------------------------------------------------------------------------
+// WinUI lights a control's border and background from the pointer's position so
+// that adjacent controls read as one lit surface. `winui_reveal.js` publishes
+// the pointer position as `--winui-reveal-x/y` on the hovered element; the two
+// radial gradients below are the whole effect.
+.o-winui-reveal {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        pointer-events: none;
+        background: radial-gradient(
+            120px circle at var(--winui-reveal-x, 50%) var(--winui-reveal-y, 50%),
+            rgba(var(--winui-accent-fill-rgb), .10) 0%,
+            transparent 70%
+        );
+        opacity: 0;
+        transition: opacity var(--winui-dur-fast) linear;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
+}
+
+// Motion off means no reveal at all - the JS never attaches, and this keeps any
+// element that already carries the class inert.
+:root[data-winui-motion="off"] .o-winui-reveal::before,
+:root[data-winui-transparency="off"] .o-winui-reveal::before {
+    display: none;
+}

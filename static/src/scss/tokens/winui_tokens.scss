@@ -1,0 +1,396 @@
+///============================================================================
+/// web_winui - Fluent design tokens as CSS custom properties
+///
+/// This is the layer the rest of the theme is written against. Unlike the Sass
+/// layer, it keeps the genuine Fluent alpha ramps (TextFillColorPrimary really
+/// is `#E4000000`, not its opaque equivalent), because CSS composites them over
+/// whatever material happens to be behind - which is exactly how the ramps are
+/// meant to work in WinUI.
+///
+/// Source: controls/dev/CommonStyles/Common_themeresources_any.xaml
+///         controls/dev/CommonStyles/CornerRadius_themeresources.xaml
+///
+/// Theme resolution, matching the Windows "App mode" setting:
+///   [data-winui-theme="light"] -> always light
+///   [data-winui-theme="dark"]  -> always dark
+///   absent / "auto"            -> follows `prefers-color-scheme`
+///============================================================================
+
+// ---------------------------------------------------------------------------
+// Light ramp
+// ---------------------------------------------------------------------------
+@mixin winui-light-tokens {
+    color-scheme: light;
+
+    // -- Text
+    --winui-text-primary: #{rgba(#000000, .8941)};      // #E4000000
+    --winui-text-secondary: #{rgba(#000000, .6196)};    // #9E000000
+    --winui-text-tertiary: #{rgba(#000000, .4471)};     // #72000000
+    --winui-text-disabled: #{rgba(#000000, .3608)};     // #5C000000
+    --winui-text-inverse: #FFFFFF;
+
+    // -- Text on an accent surface
+    --winui-on-accent-primary: #FFFFFF;
+    --winui-on-accent-secondary: #{rgba(#FFFFFF, .7020)};
+    --winui-on-accent-disabled: #FFFFFF;
+
+    // -- Control fills (rest / hover / pressed / disabled)
+    //
+    // Fluent specifies ControlFillColorDefault as #B3FFFFFF - translucent white.
+    // That only lifts a control when the surface beneath it is *not* white,
+    // which is the case in Windows, where pages sit on Mica. Odoo's views are
+    // white, so the literal token composited to pure-white-on-pure-white and
+    // every button and text box vanished into its background.
+    //
+    // The fix is the one Windows itself relies on: recess the page (see
+    // `--winui-layer-alt` below) and let the control be the opaque, lighter
+    // element on top of it.
+    --winui-control-default: #FFFFFF;
+    --winui-control-secondary: #{rgba(#F9F9F9, .5020)}; // #80F9F9F9
+    --winui-control-tertiary: #{rgba(#F9F9F9, .3020)};  // #4DF9F9F9
+    --winui-control-quarternary: #{rgba(#F3F3F3, .7608)};
+    --winui-control-disabled: #{rgba(#F9F9F9, .3020)};
+    --winui-control-input-active: #FFFFFF;
+    --winui-control-strong: #{rgba(#000000, .4471)};
+    --winui-control-strong-disabled: #{rgba(#000000, .3176)};
+    --winui-control-solid: #FFFFFF;
+
+    // -- Subtle fills, used by every "transparent until you touch it" surface:
+    //    command bar buttons, list rows, tree items, menu items.
+    --winui-subtle-transparent: transparent;
+    --winui-subtle-secondary: #{rgba(#000000, .0373)};  // #09000000
+    --winui-subtle-tertiary: #{rgba(#000000, .0235)};   // #06000000
+
+    // -- Alt control fills (expander headers, list view backplates)
+    --winui-control-alt-secondary: #{rgba(#000000, .0235)};
+    --winui-control-alt-tertiary: #{rgba(#000000, .0588)};
+    --winui-control-alt-quarternary: #{rgba(#000000, .0941)};
+
+    // -- Strokes
+    --winui-stroke-control: #{rgba(#000000, .0588)};        // #0F000000
+    --winui-stroke-control-secondary: #{rgba(#000000, .1608)}; // #29000000
+    --winui-stroke-control-strong: #{rgba(#000000, .4471)};
+    --winui-stroke-control-strong-disabled: #{rgba(#000000, .2157)};
+    --winui-stroke-on-accent: #{rgba(#FFFFFF, .0784)};
+    --winui-stroke-on-accent-secondary: #{rgba(#000000, .4000)};
+    --winui-stroke-card: #{rgba(#000000, .0588)};
+    --winui-stroke-card-solid: #EBEBEB;
+    --winui-stroke-surface: #{rgba(#757575, .4)};
+    --winui-stroke-flyout: #{rgba(#000000, .0588)};
+    --winui-stroke-divider: #{rgba(#000000, .0588)};
+
+    // -- Focus (FocusStrokeColorOuter / Inner)
+    --winui-focus-outer: #{rgba(#000000, .8941)};
+    --winui-focus-inner: #{rgba(#FFFFFF, .7020)};
+
+    // -- Elevation border: WinUI paints controls with a 1px stroke whose
+    //    *bottom* edge is darker (a ScaleTransform flips the gradient in the
+    //    light theme). That asymmetry is the single most recognisable Fluent
+    //    detail, so it gets its own pair of tokens.
+    --winui-elev-border-edge: var(--winui-stroke-control);
+    --winui-elev-border-accent-edge: var(--winui-stroke-control-secondary);
+    --winui-elev-border-side: bottom;
+
+    // -- Surfaces
+    // Cards sit a touch below their hover state so that hovering lifts them to
+    // pure white, rather than both landing on the same value.
+    --winui-card-default: #FCFCFC;
+    --winui-card-secondary: #{rgba(#F6F6F6, .5020)};
+    --winui-card-tertiary: #FFFFFF;
+    --winui-layer-default: #{rgba(#FFFFFF, .5020)};
+    // The content layer is deliberately a shade below white. It is the "page"
+    // a WinUI app draws on - never the lightest thing on screen - and it is
+    // what gives buttons, text boxes and cards something to lift off.
+    --winui-layer-alt: #F7F7F7;
+    // An opaque stand-in for `--winui-layer-alt`, for the places that cannot be
+    // translucent: a sticky table header would otherwise show the rows sliding
+    // underneath it.
+    --winui-layer-solid: #F7F7F7;
+    --winui-smoke: #{rgba(#000000, .3020)};
+
+    --winui-solid-base: #F3F3F3;
+    --winui-solid-secondary: #EEEEEE;
+    --winui-solid-tertiary: #F9F9F9;
+    --winui-solid-quarternary: #FFFFFF;
+    --winui-solid-quinary: #FDFDFD;
+    --winui-solid-senary: #FFFFFF;
+    --winui-solid-base-alt: #DADADA;
+
+    // -- System fills
+    --winui-fill-success: #0F7B0F;
+    --winui-fill-caution: #9D5D00;
+    --winui-fill-critical: #C42B1C;
+    --winui-fill-neutral: #{rgba(#000000, .4471)};
+    --winui-fill-solid-neutral: #8A8A8A;
+    --winui-fill-success-bg: #DFF6DD;
+    --winui-fill-caution-bg: #FFF4CE;
+    --winui-fill-critical-bg: #FDE7E9;
+    --winui-fill-neutral-bg: #{rgba(#000000, .0235)};
+    --winui-fill-attention-bg: #{rgba(#F6F6F6, .5020)};
+
+    // -- Text colours for status, darkened for body-copy contrast
+    --winui-text-success: #0B6A0B;
+    --winui-text-caution: #7A4700;
+    --winui-text-critical: #A02418;
+
+    // -- Elevation. WinUI draws these with a ThemeShadow whose blur grows with
+    //    the layer: 32px for flyouts, 128px for dialogs.
+    --winui-shadow-card: 0 1px 2px #{rgba(#000000, .10)}, 0 0 1px #{rgba(#000000, .07)};
+    --winui-shadow-tooltip: 0 4px 8px #{rgba(#000000, .14)}, 0 0 2px #{rgba(#000000, .12)};
+    --winui-shadow-flyout: 0 8px 16px #{rgba(#000000, .14)}, 0 0 2px #{rgba(#000000, .12)};
+    --winui-shadow-dialog: 0 32px 64px #{rgba(#000000, .1876)}, 0 2px 21px #{rgba(#000000, .1474)};
+
+    // -- Materials. Mica is a wallpaper-tinted, desaturated backdrop; without a
+    //    desktop wallpaper to sample the closest honest approximation is the
+    //    accent tinted into the solid base at very low strength.
+    --winui-mica-base: #F3F3F3;
+    --winui-mica-tint-opacity: .5;
+    --winui-mica-alt-base: #DADADA;
+    // Fluent flyout acrylic is near-opaque. It was at .85, which relies on the
+    // browser actually compositing the backdrop blur - where it does not (or
+    // does it weakly), the content underneath reads straight through the menu.
+    // The button box's overflow panel showed the status bar through itself.
+    --winui-acrylic-tint: #{rgba(#FCFCFC, .97)};
+    // Fluent separates "Background Acrylic" from the much more opaque in-app
+    // variant. Large surfaces that carry real content - the app drawer - use
+    // the opaque one, so they stay legible even where the browser declines to
+    // composite the blur.
+    --winui-acrylic-tint-strong: #{rgba(#F9F9F9, .96)};
+    --winui-acrylic-fallback: #F9F9F9;
+    --winui-acrylic-blur: 30px;
+    --winui-acrylic-saturation: 1.25;
+    --winui-noise-opacity: .02;
+}
+
+// ---------------------------------------------------------------------------
+// Dark ramp
+// ---------------------------------------------------------------------------
+@mixin winui-dark-tokens {
+    color-scheme: dark;
+
+    --winui-text-primary: #FFFFFF;
+    --winui-text-secondary: #{rgba(#FFFFFF, .7725)};    // #C5FFFFFF
+    --winui-text-tertiary: #{rgba(#FFFFFF, .5294)};     // #87FFFFFF
+    --winui-text-disabled: #{rgba(#FFFFFF, .3647)};     // #5DFFFFFF
+    --winui-text-inverse: #{rgba(#000000, .8941)};
+
+    --winui-on-accent-primary: #000000;
+    --winui-on-accent-secondary: #{rgba(#000000, .5020)};
+    --winui-on-accent-disabled: #{rgba(#FFFFFF, .5294)};
+
+    --winui-control-default: #{rgba(#FFFFFF, .0588)};   // #0FFFFFFF
+    --winui-control-secondary: #{rgba(#FFFFFF, .0824)}; // #15FFFFFF
+    --winui-control-tertiary: #{rgba(#FFFFFF, .0314)};  // #08FFFFFF
+    --winui-control-quarternary: #{rgba(#FFFFFF, .0588)};
+    --winui-control-disabled: #{rgba(#FFFFFF, .0431)};
+    --winui-control-input-active: #{rgba(#1E1E1E, .7020)};
+    --winui-control-strong: #{rgba(#FFFFFF, .5451)};
+    --winui-control-strong-disabled: #{rgba(#FFFFFF, .2471)};
+    --winui-control-solid: #454545;
+
+    --winui-subtle-transparent: transparent;
+    --winui-subtle-secondary: #{rgba(#FFFFFF, .0588)};  // #0FFFFFFF
+    --winui-subtle-tertiary: #{rgba(#FFFFFF, .0392)};   // #0AFFFFFF
+
+    --winui-control-alt-secondary: #{rgba(#000000, .0980)};
+    --winui-control-alt-tertiary: #{rgba(#FFFFFF, .0431)};
+    --winui-control-alt-quarternary: #{rgba(#FFFFFF, .0706)};
+
+    --winui-stroke-control: #{rgba(#FFFFFF, .0706)};        // #12FFFFFF
+    --winui-stroke-control-secondary: #{rgba(#FFFFFF, .0941)}; // #18FFFFFF
+    --winui-stroke-control-strong: #{rgba(#FFFFFF, .5451)};
+    --winui-stroke-control-strong-disabled: #{rgba(#FFFFFF, .1569)};
+    --winui-stroke-on-accent: #{rgba(#FFFFFF, .0784)};
+    --winui-stroke-on-accent-secondary: #{rgba(#000000, .1373)};
+    --winui-stroke-card: #{rgba(#000000, .0980)};
+    --winui-stroke-card-solid: #1C1C1C;
+    --winui-stroke-surface: #{rgba(#757575, .4)};
+    --winui-stroke-flyout: #{rgba(#000000, .2)};
+    --winui-stroke-divider: #{rgba(#FFFFFF, .0824)};
+
+    --winui-focus-outer: #FFFFFF;
+    --winui-focus-inner: #{rgba(#000000, .7020)};
+
+    // In the dark theme the gradient is *not* flipped, so the brighter edge
+    // sits at the top of the control instead of the bottom.
+    --winui-elev-border-edge: var(--winui-stroke-control);
+    --winui-elev-border-accent-edge: var(--winui-stroke-control-secondary);
+    --winui-elev-border-side: top;
+
+    --winui-card-default: #{rgba(#FFFFFF, .0510)};
+    --winui-card-secondary: #{rgba(#FFFFFF, .0314)};
+    --winui-card-tertiary: #{rgba(#FFFFFF, .0706)};
+    --winui-layer-default: #{rgba(#3A3A3A, .3)};
+    --winui-layer-alt: #{rgba(#FFFFFF, .0510)};
+    // #2B2B2B is LayerFillColorAlt composited over SolidBackgroundFillColorBase,
+    // i.e. what the layer already looks like - just without the alpha.
+    --winui-layer-solid: #2B2B2B;
+    --winui-smoke: #{rgba(#000000, .3020)};
+
+    --winui-solid-base: #202020;
+    --winui-solid-secondary: #1C1C1C;
+    --winui-solid-tertiary: #282828;
+    --winui-solid-quarternary: #2C2C2C;
+    --winui-solid-quinary: #333333;
+    --winui-solid-senary: #373737;
+    --winui-solid-base-alt: #0A0A0A;
+
+    --winui-fill-success: #6CCB5F;
+    --winui-fill-caution: #FCE100;
+    --winui-fill-critical: #FF99A4;
+    --winui-fill-neutral: #{rgba(#FFFFFF, .5451)};
+    --winui-fill-solid-neutral: #9D9D9D;
+    --winui-fill-success-bg: #393D1B;
+    --winui-fill-caution-bg: #433519;
+    --winui-fill-critical-bg: #442726;
+    --winui-fill-neutral-bg: #{rgba(#FFFFFF, .0314)};
+    --winui-fill-attention-bg: #{rgba(#FFFFFF, .0314)};
+
+    --winui-text-success: #6CCB5F;
+    --winui-text-caution: #FCE100;
+    --winui-text-critical: #FF99A4;
+
+    --winui-shadow-card: 0 1px 2px #{rgba(#000000, .28)}, 0 0 1px #{rgba(#000000, .22)};
+    --winui-shadow-tooltip: 0 4px 8px #{rgba(#000000, .26)}, 0 0 2px #{rgba(#000000, .22)};
+    --winui-shadow-flyout: 0 8px 16px #{rgba(#000000, .26)}, 0 0 2px #{rgba(#000000, .22)};
+    --winui-shadow-dialog: 0 32px 64px #{rgba(#000000, .37)}, 0 2px 21px #{rgba(#000000, .29)};
+
+    --winui-mica-base: #202020;
+    --winui-mica-tint-opacity: .8;
+    --winui-mica-alt-base: #0A0A0A;
+    --winui-acrylic-tint: #{rgba(#2C2C2C, .98)};
+    --winui-acrylic-tint-strong: #{rgba(#282828, .985)};
+    --winui-acrylic-fallback: #2C2C2C;
+    --winui-acrylic-blur: 30px;
+    --winui-acrylic-saturation: 1.25;
+    --winui-noise-opacity: .04;
+}
+
+// ---------------------------------------------------------------------------
+// Theme-independent tokens
+// ---------------------------------------------------------------------------
+:root {
+    // -- Shape: ControlCornerRadius 4, OverlayCornerRadius 8. The "square"
+    //    corner preference re-points these to 0 rather than editing 200 rules.
+    --winui-radius-control: 4px;
+    --winui-radius-overlay: 8px;
+    --winui-radius-pill: 9999px;
+
+    // -- Motion. WinUI expresses control feedback in 1/12s multiples and page
+    //    transitions with a decelerate curve.
+    --winui-dur-instant: 0.0833s;   //  83ms - pointer-over / pressed feedback
+    --winui-dur-fast: 0.167s;       // 167ms - flyouts, checkmarks, switches
+    --winui-dur-normal: 0.25s;      // 250ms - expanders, dialogs
+    --winui-dur-slow: 0.333s;       // 333ms - page / connected animations
+    --winui-ease-standard: cubic-bezier(0.8, 0, 0.2, 1);
+    --winui-ease-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+    --winui-ease-accelerate: cubic-bezier(0.7, 0, 1, 0.5);
+    --winui-ease-point: cubic-bezier(0, 0, 0, 1);
+
+    // -- Density. Standard is the desktop default (32px controls, 40px rows);
+    //    Compact matches WinUI's compact resource dictionary; Touch follows the
+    //    44px minimum target size from the Fluent accessibility guidance.
+    --winui-control-height: 32px;
+    --winui-control-height-sm: 24px;
+    --winui-row-height: 40px;
+    --winui-nav-item-height: 36px;
+    --winui-titlebar-height: 48px;
+    --winui-gap: 8px;
+    --winui-content-padding: 16px;
+
+    // -- Type ramp (TextBlock_themeresources.xaml)
+    --winui-font-caption: 12px;
+    --winui-font-body: 14px;
+    --winui-font-body-large: 18px;
+    --winui-font-subtitle: 20px;
+    --winui-font-title: 28px;
+    --winui-font-title-large: 40px;
+    --winui-font-display: 68px;
+    --winui-line-caption: 16px;
+    --winui-line-body: 20px;
+    --winui-line-body-large: 24px;
+    --winui-line-subtitle: 28px;
+    --winui-line-title: 36px;
+
+    // -- Accent ramp. Overwritten at runtime by the theme service; the values
+    //    here are the Windows default blue so the bundle renders correctly even
+    //    before any JavaScript has run.
+    --winui-accent: #0078D4;
+    --winui-accent-light-1: #429CE3;
+    --winui-accent-light-2: #76B9ED;
+    --winui-accent-light-3: #A6D8FF;
+    --winui-accent-dark-1: #005A9E;
+    --winui-accent-dark-2: #004275;
+    --winui-accent-dark-3: #002642;
+
+    // The accent brush actually used on fills; the dark theme shifts one step
+    // lighter, exactly as AccentFillColorDefaultBrush does in WinUI.
+    // Channel-only companions, so that rules can build their own alphas with
+    // `rgba(var(--winui-accent-rgb), .12)` without needing relative colours.
+    --winui-accent-rgb: 0, 120, 212;
+    --winui-accent-light-2-rgb: 118, 185, 237;
+    --winui-accent-dark-1-rgb: 0, 90, 158;
+
+    --winui-accent-fill: var(--winui-accent);
+    --winui-accent-fill-rgb: var(--winui-accent-rgb);
+    --winui-accent-text: var(--winui-accent-dark-1);
+
+    @include winui-light-tokens;
+}
+
+:root[data-winui-theme="dark"] {
+    @include winui-dark-tokens;
+
+    --winui-accent-fill: var(--winui-accent-light-2);
+    --winui-accent-fill-rgb: var(--winui-accent-light-2-rgb);
+    --winui-accent-text: var(--winui-accent-light-3);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-winui-theme="light"]) {
+        @include winui-dark-tokens;
+
+        --winui-accent-fill: var(--winui-accent-light-2);
+        --winui-accent-fill-rgb: var(--winui-accent-light-2-rgb);
+        --winui-accent-text: var(--winui-accent-light-3);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Preference switches
+// ---------------------------------------------------------------------------
+:root[data-winui-corner="square"] {
+    --winui-radius-control: 0px;
+    --winui-radius-overlay: 0px;
+    --winui-radius-pill: 0px;
+}
+
+:root[data-winui-density="compact"] {
+    --winui-control-height: 28px;
+    --winui-control-height-sm: 22px;
+    --winui-row-height: 32px;
+    --winui-nav-item-height: 32px;
+    --winui-titlebar-height: 40px;
+    --winui-gap: 6px;
+    --winui-content-padding: 12px;
+}
+
+:root[data-winui-density="touch"] {
+    --winui-control-height: 40px;
+    --winui-control-height-sm: 32px;
+    --winui-row-height: 48px;
+    --winui-nav-item-height: 44px;
+    --winui-titlebar-height: 56px;
+    --winui-gap: 12px;
+    --winui-content-padding: 20px;
+}
+
+// "Transparency effects: off" in the Windows personalisation settings. Mica and
+// Acrylic collapse to the solid surfaces they are layered on.
+:root[data-winui-transparency="off"] {
+    --winui-acrylic-tint: var(--winui-acrylic-fallback);
+    --winui-acrylic-blur: 0px;
+    --winui-acrylic-saturation: 1;
+    --winui-mica-tint-opacity: 0;
+    --winui-noise-opacity: 0;
+}
