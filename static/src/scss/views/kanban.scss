@@ -204,3 +204,21 @@
         color: var(--winui-text-secondary);
     }
 }
+
+// ---------------------------------------------------------------------------
+// 16.0: the record's inner card
+// ---------------------------------------------------------------------------
+// 16.0 wraps a kanban record's content in an `.oe_kanban_card` div and paints
+// *that* as the card - white fill, 1px border, its own padding - through
+// `.o_kanban_renderer .o_kanban_record > div`. This theme makes the record
+// itself the card, so the two nest and the board reads as a card inside a card.
+//
+// The record keeps the surface; the inner div is flattened to a plain content
+// box. Its padding goes too, or the content would be inset twice.
+.o_web_client .o_kanban_renderer .o_kanban_record > div.oe_kanban_card {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+}

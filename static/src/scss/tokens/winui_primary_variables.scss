@@ -227,7 +227,15 @@ $o-border-radius-lg: o-to-rem(8px);
 // ---------------------------------------------------------------------------
 // WinUI standard control height is 32px; ButtonPadding is 11,5,11,6.
 $o-spacer: 16px;
-$o-horizontal-padding: 16px;
+// Odoo derives the form sheet's padding *and* the negative margins that pull
+// the button box and embedded lists out to the sheet's edge from this one
+// value - the sheet gets `$o-horizontal-padding * 2` and the bleed
+// `-$o-horizontal-padding * 2`. Setting it to 12px yields the theme's 24px
+// content inset on both sides of that relationship; hard-coding the sheet
+// padding instead leaves the bleed 8px too wide and the content escapes the
+// card. It also tightens the control panel's gutter by 4px, which suits the
+// Fluent metrics.
+$o-horizontal-padding: 12px;
 $o-form-spacing-unit: 4px;
 
 $o-input-padding-y: 3px;

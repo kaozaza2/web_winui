@@ -268,3 +268,35 @@
     background-color: var(--winui-layer-solid);
     color: var(--winui-text-primary);
 }
+
+// ---------------------------------------------------------------------------
+// 6. 16.0 accent surfaces
+// ---------------------------------------------------------------------------
+// Odoo 16 compiles the primary colour into its stylesheets as a literal, so
+// anything painted with it is frozen at build time and cannot follow a runtime
+// accent change - pick green in the appearance menu and these stay Fluent blue.
+//
+// Two of them read a custom property first and only fall back to the literal,
+// so filling the hook is enough. The burger menu's top bar has no hook and is
+// answered by selector.
+:root {
+    --ChatWindowHeader-background-color: var(--winui-accent-fill);
+    --mobileSearch__header-bg: var(--winui-accent-fill);
+}
+
+.o_web_client .o_burger_menu .o_burger_menu_topbar {
+    background-color: var(--winui-accent-fill);
+    color: var(--winui-on-accent-primary);
+}
+
+// The pane itself carries the acrylic material; its content area ships an
+// opaque light fill that paints straight over it, which is what leaves the
+// menu reading as flat grey blocks on the sidebar.
+// `!important` because the pane's content carries `bg-view`, and this theme's
+// own `bg-view` sweep in `compat/dark_surface.scss` forces the layer tone on it
+// - correct for a view surface, wrong for a pane that already has a material.
+.o_web_client .o_burger_menu .o_burger_menu_content,
+.o_web_client .o_burger_menu .o_burger_menu_content .dropdown-toggle {
+    background-color: transparent !important;
+    color: var(--winui-text-primary);
+}

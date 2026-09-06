@@ -250,3 +250,40 @@
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// The view switcher inside a flyout
+// ---------------------------------------------------------------------------
+// On a small screen Odoo collapses the switcher into a dropdown, and the same
+// `.o_switch_view` buttons are rendered as its menu items. The SelectorBar
+// treatment above then follows them in, but its selected state is a raised
+// chip - opaque fill, border and card shadow - which only reads correctly
+// against the recessed track the SelectorBar draws behind it. In a flyout there
+// is no track, so the chip looks like a box nested inside the menu.
+//
+// Here they are menu rows: flat, full control height, selection carried by a
+// subtle fill and the accent rather than by elevation.
+// `.o_cp_switch_buttons` is on the selector deliberately: the flyout is nested
+// *inside* it, so the SelectorBar rule above still applies here at (0,5,0).
+// Matching that weight and coming later in the file is what wins the tie.
+.o_web_client .o_cp_switch_buttons .dropdown-menu,
+.o_web_client .o_cp_switch_buttons .o-dropdown--menu {
+    .o_switch_view {
+        block-size: var(--winui-control-height);
+        min-block-size: var(--winui-control-height);
+        border: 0 !important;
+        background-color: transparent;
+        box-shadow: none !important;
+
+        &:hover {
+            background-color: var(--winui-subtle-secondary);
+        }
+
+        &.active {
+            background-color: var(--winui-subtle-secondary) !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            color: var(--winui-accent-text);
+        }
+    }
+}

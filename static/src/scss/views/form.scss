@@ -40,12 +40,15 @@
     // pushing the totals column out of view. The sheet already hugs its content
     // vertically; the full-height surface behind it is the content layer,
     // handled in `layout/webclient.scss`.
+    // No `padding` here: Odoo computes it as `$o-horizontal-padding * 2` and
+    // derives the button box's and embedded lists' negative bleed margins from
+    // the same value, so overriding one and not the other splits them apart.
+    // The variable is set in `tokens/winui_primary_variables.scss`.
     .o_form_sheet {
-        padding: 24px;
         border: 1px solid var(--winui-stroke-card);
         border-radius: var(--winui-radius-overlay);
         background-color: var(--winui-card-default);
-        box-shadow: none;
+        box-shadow: var(--winui-shadow-card);
     }
 
     // -- Page title ---------------------------------------------------------
