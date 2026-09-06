@@ -146,8 +146,14 @@
         i, small { color: inherit; }
     }
 
+    // The trailing padding is a space *reservation*, not decoration: 16.0
+    // positions `.o_facet_remove` absolutely against the chip's trailing edge
+    // and keeps it clear of the label with `padding: 0 18px 0 5px` here.
+    // Replacing that padding without restoring the reservation drops the
+    // remove button straight on top of the facet's text. The value matches the
+    // 20px button this theme uses rather than Odoo's 18px.
     .o_facet_values {
-        padding-inline: 6px 0;
+        padding-inline: 6px 22px;
         font-size: var(--winui-font-caption);
         color: var(--winui-text-primary);
     }

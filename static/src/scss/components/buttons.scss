@@ -385,6 +385,21 @@
         transform: rotate(-135deg) translate(-2px, -2px);
     }
 
+    // 16.0 marks a caret-free dropdown on the *wrapper*
+    // (`.o-dropdown--no-caret > .dropdown-toggle::after { content: normal }`),
+    // where 17.0 onwards marks the toggle button itself - so the
+    // `:not(.o-dropdown)` guard above does not exclude these and this theme's
+    // caret overrides Odoo's opt-out on weight. That matters beyond decoration:
+    // the Fluent chevron is wider than the Bootstrap triangle Odoo sizes around,
+    // so on an icon-only toggle in a table header it pushes the control out of
+    // its cell and off the viewport.
+    //
+    // Only the opt-out is honoured here. Dropdowns 16.0 does *not* mark stay
+    // carted, and get the Fluent chevron like any other.
+    .o-dropdown--no-caret > .dropdown-toggle::after {
+        content: none;
+    }
+
     .dropdown-toggle.o-no-caret::after,
     .dropdown-toggle.o-no-caret::before {
         content: normal;
